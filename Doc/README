@@ -1,0 +1,7 @@
+Contents
+--------
+User's Guide as PDF and PostScript:
+userguide.pdf  userguide.ps
+
+Collection of prototypes of main JADAMILU functions:
+CPJD_prototypes.f DPJD_prototypes.f  SPJD_prototypes.f ZPJD_prototypes.f
