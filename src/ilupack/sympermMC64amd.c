@@ -5,7 +5,7 @@
 
 #include <blas.h>
 #include <hsl.h>
-#include <amdord.h>
+#include <amd.h>
 #include <ilupack.h>
 
 #include <ilupackmacros.h>

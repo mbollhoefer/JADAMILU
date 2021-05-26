@@ -353,6 +353,7 @@ void mexFunction
 #ifdef PRINT_INFO
     mexPrintf("call PJD\n"); fflush(stdout);
 #endif
+
     dpjd(&n,a,ja,ia, eigs, res, X, &lx, &neig, &sigma, &isearch, &ninit, 
 	 &madspace, &iter, &tol, &shift, &droptol, &mem, icntl, &iprint, 
 	 &info, &gap);

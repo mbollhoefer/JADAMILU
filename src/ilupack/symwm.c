@@ -4,7 +4,6 @@
 #include <math.h>
 
 #include <blas.h>
-#include <pardiso.h>
 #include <ilupack.h>
 
 #include <ilupackmacros.h>

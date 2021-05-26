@@ -81,7 +81,7 @@ RLFLAGS=
 
 
 # Linux
-LIBS=-ljadamilu  -llapack -lblas -lm -lc
+LIBS=-ljadamilu  -llapack -lblas -lamd -lm -lc
 
 
 # -------------------------------

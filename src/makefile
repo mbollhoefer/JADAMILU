@@ -12,16 +12,12 @@ include makefiles/default.mk
 
 DIRILUPACK=ilupack/
 DIRJD=jd/
-DIRAMD=amd/
-DIRMC64=mc64/
 DIRBLASLIKE=blaslike/
-DIRBLAS=blas/
-DIRLAPACK=lapack/
 
 
 .PHONY:  srilupack rilupack scilupack cilupack srjd rjd scjd cjd\
-         srourlibs rourlibs scourlibs courlibs clean clear mc64 amd \
-         blas lapack srlibs rlibs sclibs clibs blaslike
+         srourlibs rourlibs scourlibs courlibs clean clear  \
+         srlibs rlibs sclibs clibs blaslike
 
 ourpart: srourlibs rourlibs scourlibs courlibs
 
@@ -88,55 +84,26 @@ srourlibs: srilupack srjd blaslike
 	@ echo bind libraries
 	@ cd ../lib;\
         $(MAKE) ourmain "MYPLATFORM=$(PLATFORM)" "PRECISION=s" \
-        "MYSTARTDIR=$(STARTDIR)" \
-        "AMD=" \
-        "MC64="\
-        "BLAS=" \
-        "LAPACK="
+        "MYSTARTDIR=$(STARTDIR)" 
 
 rourlibs: rilupack rjd blaslike
 	@ echo bind libraries
 	@ cd ../lib;\
         $(MAKE) ourmain "MYPLATFORM=$(PLATFORM)" "PRECISION=d" \
-        "MYSTARTDIR=$(STARTDIR)" \
-        "AMD=" \
-        "MC64="\
-        "BLAS=" \
-        "LAPACK="
+        "MYSTARTDIR=$(STARTDIR)" 
 
 scourlibs: scilupack scjd blaslike
 	@ echo bind libraries
 	@ cd ../lib;\
         $(MAKE) ourmain "MYPLATFORM=$(PLATFORM)" "PRECISION=c" \
-        "MYSTARTDIR=$(STARTDIR)" \
-        "AMD=" \
-        "MC64="\
-        "BLAS=" \
-        "LAPACK="
+        "MYSTARTDIR=$(STARTDIR)" 
 
 courlibs: cilupack cjd blaslike
 	@ echo bind libraries
 	@ cd ../lib;\
         $(MAKE) ourmain "MYPLATFORM=$(PLATFORM)" "PRECISION=z" \
-        "MYSTARTDIR=$(STARTDIR)" \
-        "AMD=" \
-        "MC64="\
-        "BLAS=" \
-        "LAPACK="
+        "MYSTARTDIR=$(STARTDIR)" 
 
-
-mc64: $(MC64)
-	@ echo build MC64 matching
-	@ cd mc64; \
-        $(MAKE)  "MYPLATFORM=$(PLATFORM)" \
-        "MYSTARTDIR=$(STARTDIR)"
-
-
-amd:
-	@ echo build AMD reordering
-	@ cd amd; \
-        $(MAKE)  "MYPLATFORM=$(PLATFORM)" \
-        "MYSTARTDIR=$(STARTDIR)"
 
 
 blaslike:
@@ -145,37 +112,26 @@ blaslike:
         $(MAKE) "MYPLATFORM=$(PLATFORM)" "MYSTARTDIR=$(STARTDIR)"
 
 
-blas:
-	@ echo build blas library
-	@ cd blas;\
-        $(MAKE) "MYPLATFORM=$(PLATFORM)" "MYSTARTDIR=$(STARTDIR)"
 
-
-lapack:
-	@ echo build lapack library
-	@ cd lapack;\
-        $(MAKE) "MYPLATFORM=$(PLATFORM)" "MYSTARTDIR=$(STARTDIR)"
-
-
-srlibs: srilupack srjd mc64 amd blas lapack blaslike
+srlibs: srilupack srjd blaslike
 	@ echo bind libraries
 	@ cd ../lib;\
         $(MAKE) "MYPLATFORM=$(PLATFORM)"  "PRECISION=s"\
         "MYSTARTDIR=$(STARTDIR)"
 
-rlibs: rilupack rjd mc64 amd blas lapack blaslike
+rlibs: rilupack rjd blaslike
 	@ echo bind libraries
 	@ cd ../lib;\
         $(MAKE) "MYPLATFORM=$(PLATFORM)"  "PRECISION=d" \
         "MYSTARTDIR=$(STARTDIR)"
 
-sclibs: scilupack scjd mc64 amd blas lapack blaslike
+sclibs: scilupack scjd  blaslike
 	@ echo bind libraries
 	@ cd ../lib;\
         $(MAKE) "MYPLATFORM=$(PLATFORM)"  "PRECISION=c"\
         "MYSTARTDIR=$(STARTDIR)"
 
-clibs: cilupack cjd mc64 amd blas lapack blaslike
+clibs: cilupack cjd  blaslike
 	@ echo bind libraries
 	@ cd ../lib;\
         $(MAKE) "MYPLATFORM=$(PLATFORM)"  "PRECISION=z" \

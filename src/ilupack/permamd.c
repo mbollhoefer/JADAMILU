@@ -3,7 +3,7 @@
 #include <time.h>
 #include <math.h>
 
-#include <amdord.h>
+#include <amd.h>
 #include <ilupack.h>
 
 #include <ilupackmacros.h>

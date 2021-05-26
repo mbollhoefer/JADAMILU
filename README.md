@@ -16,52 +16,98 @@ dependent upon the use of the package.
 You shall use reasonable endeavors to notify the authors of 
 the package of this publication. 
 
+
+
 ----------------------------------------------------------------------
 
-You read this file because you have successfully downloaded the
-jadamilu.tgz file corresponding to your compiler and architecture,
-and used the command
 
-> tar zxvf jadamilu.tgz
 
-to uncompress the package.
-Assumed you did this in directory /MYDIR 
-(for instance, your home directory)
-This created a directory /MYDIR/JADAMILU and the present file is
-/MYDIR/JADAMILU/README
-
-You will find the documentation in /MYDIR/JADAMILU/Doc/ (a userguide giving
+You will find the documentation in JADAMILU/Doc/ (a userguide giving
 additional information to the CPC paper referred above).
 
-In /MYDIR/JADAMILU/Doc/DPJD.f (resp. SPJD.f, CPJD.f, ZPJD.f) you will 
-find the source of the main driver routines, that is, of the routines 
-your application program may call to use JADAMILU. 
+In JADAMILU/Doc/DPJD_prototype.f (resp. SPJD_prototype.f, CPJD_prototype.f,
+ZPJD_prototype.f) you will find for your information a copy of the source of the
+main driver routines, that is, of the routines your application program may call
+to use JADAMILU. 
 
 The user guide refers to several examples. The related sources are located
-in /MYDIR/JADAMILU/samples/
+in JADAMILU/samples/
 
-The file /MYDIR/JADAMILU/Doc/DPJD.f (resp. SPJD.f, CPJD.f, ZPJD.f) is 
-only given to you for illustration purpose. All routines and subroutines
-have been precompiled for you and stored in a library 
-/MYDIR/JADAMILU/lib/ArchComp/libjadamilu.a , where ArchComp reflects the 
+The file JADAMILU/Doc/DPJD_prototype.f (resp. SPJD_prototype.f, CPJD_prototype.f,
+ZPJD_prototype.f) is only given to you for illustration purpose. All routines and
+subroutines have been precompiled for you and stored in a library 
+JADAMILU/lib/ArchComp/libjadamilu.a , where ArchComp reflects the 
 architecture of the processor, the operating system, the storage mode 
 for integers and the compiler you plan to use, according the table at 
 the bottom of this README file.
-Besides, you will find /MYDIR/JADAMILU/lib/ArchComp/libmylapack.a and
-/MYDIR/JADAMILU/lib/ArchComp/libmyblas.a , which contain the part of the
-LAPACK  and BLAS libraries needed by JADAMILU.
+
+
+
+building the library
+--------------------
+
+To build the JADAMILU library, go to the JADAMILU/src directory and modify
+"user.mk" in order to set up your most favoured compiler and architecture
+according the table at the bottom of this README file. After that, type "make".
+JADAMILU will compute the library "libjadamilu.a" which will be located at
+JADAMILU/lib/ArchComp/.
+
+Before you compile any sample code, you need to get the AMD library which is
+part of SuiteSparse library of Tim Davis (Texas A&M UNiversity). Downloading and
+compiling the SuiteSparse library will also provide libraries "libamd.a" and
+"libsuitesparseconfig.a" (These are typically located in some subdirectory such
+as SuiteSparse/AMD/Lib/ and SuiteSparse/SuiteSparse_config/). You could copy
+these libraries (for simplicity) to JADAMILU/lib/ArchComp/ or refer differently
+to them.
+
+Furthermore you need your own BLAS and LAPACK library. Simple precompiled F77
+sources are could be used, but these are likely to be slow. You better use some
+vendor-specific libraries which highly optimized (if in doubt, ask your system
+administrator for details).
+
+
+Last but not least you need to get MC64 and MC21 from the HSL Mathematical
+Software Library (https://www.hsl.rl.ac.uk/). For copyrights, terms of use, etc.,
+we kindly refer to read carefully the their conditions and make sure that they
+apply to you. You could compile these sources in the same way as the library has
+been built including options for long integer, position independent code, memory
+model, "-c" etc. Then copy the object files MC*.o to  JADAMILU/lib/ArchComp/
+For example, if you are using the GNU compiler and you want to use 64 bit
+long integer, then use a command such as
+> gfortran -O -fPIC -m64 -fdefault-integer-8 -mcmodel=medium -c MC64D.f
+This refers to the INT64YGNU option
+
+If you are using 32 bit integer in large memory space use
+> gfortran -O -fPIC -m64 -mcmodel=medium -c MC64D.f
+This refers to the INT64NGNU option
+
+If you have no special requirements, simply use
+> gfortran -O -fPIC -c MC64D.f
+This refers to the INT32GNU option
+
+Other compilers and options are treated accordingly. You may take a look at
+JADAMILU/src/makefiles for some suggestions.
+
+
+
+compiling the main program
+--------------------------
 
 To compile any program using JADAMILU, for instance the examples in
-/MYDIR/JADAMILU/samples/ , go to the directory where the program is 
+JADAMILU/samples/ , go to the directory where the program is 
 located and use the command
 
-> mycompiler myprog.f -L/MYDIR/JADAMILU/lib/ArchComp -ljadamilu -lmylapack -lmyblas
+> mycompiler OPTIONS myprog.f -L ../lib/ArchComp -ljadamilu -lamd -lsuitesparseconfig -llapack -lblas ../lib/ArchComp/MC*.o
 
 where mycompiler stands for the Fortran compiler matching ArchComp.  
 For instance, if you have an Intel processor with 32 bit architecture
 and use gfortran compiler, EXAMPLE1.f will be compiled with
 
-> gfortran EXAMPLE1.f -L/MYDIR/JADAMILU/lib/INT32GNU -ljadamilu -lmylapack -lmyblas
+> gfortran EXAMPLE1.f  -L ../lib/INT32GNU -ljadamilu -lamd -lsuitesparseconfig -llapack -lblas ../lib/INT32GNU/MC*.o
+
+Similarly, 
+> gfortran -m64 -fdefault-integer-8 -mcmodel=medium EXAMPLE1.f  -L ../lib/INT64NGNU -ljadamilu -lamd -lsuitesparseconfig -llapack -lblas ../lib/INT64NGNU/MC*.o
+would refer to long address space and 64 bit long integer
 
 Of course, you may insert your favorite options, like "-O" for optimization
 or "-o myprog" so that the executable has name "myprog" instead of a.out
@@ -70,26 +116,30 @@ Note that if the compiler suite contains a Fortran 90 compiler,
 mycompiler may be this Fortran 90 compiler and myprog may have 
 extension .f90 ; for instance, with pgf:
 
-> pgf90 myprog.f90 -L/MYDIR/JADAMILU/lib/ArchComp -ljadamilu -lmylapack -lmyblas
-
-Note that LAPACK and BLAS are standard libraries, and optimized versions
-are installed on many systems. If this is true for your system, you
-may compile your code with
-
-> mycompiler myprog.f -L/MYDIR/JADAMILU/lib/ArchComp -ljadamilu -llapack -lblas
-
-Then, the system version of LAPACK and BLAS will be used instead of
-the version provided with JADAMILU. Possibly (according the way system
-versions have been installed), this requires an additional
--L/LAPACKBLASDIR option to tell the compiler where to find these
-system LAPACK and BLAS (see your system administrator for details).
+> pgf90 myprog.f90  -L ../lib/ArchComp -ljadamilu -lamd -lsuitesparseconfig -llapack -lblas ../lib/ArchComp/MC*.o
 
 Of course, these are simple examples. JADAMILU may also be used in complex
 applications with programs split in several files and possibly built
 with makefile. It is easy to deduce how to proceed from the examples
 above, in particular how to adapt possible Makefile
 
+
+
+Compiling the CMEX interfaces for MATLAB
+----------------------------------------
+go to the subdirectory JADAMILU/matlabsrc and type "make".
+After that, you will find in the subdirectory JADAMILU/matlab the associated
+binaries (which have an ending like *.mex*) along with JADAMILU's two
+MATLAB drivers "PJDinit.m", which is used to init your parameters to the
+default values and "PJD.m" which is JADAMILU's eigensolver call. "PJD.m"
+is set up along the MATLAB "eigs" function. There are two sample codes
+"example1.m" and "example2.m" which demonstrate the usage of PJDinit and PJD
+
+
+
 ________________________________________________________________
+
+
 
 TABLE of ArchComp
 -----------------

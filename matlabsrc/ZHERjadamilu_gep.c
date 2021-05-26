@@ -86,8 +86,8 @@ void mexFunction
                tol, droptol,  *pr, *pi, gap, condest, *M_valuesR, *M_valuesI;
     doublecomplex *a, *m, *X;
 
-    if (nrhs!=4)
-       mexErrMsgTxt("Four input arguments required.");
+    if (nrhs!=5)
+       mexErrMsgTxt("Five input arguments required.");
     else if (nlhs!=3)
        mexErrMsgTxt("Three output arguments are required.");
 

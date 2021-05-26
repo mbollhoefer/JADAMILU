@@ -43,7 +43,7 @@ LONGINTEGER=
 # which fortran compiler is used
 FF=gfortran
 # its flags
-FFFLAGS=  -O -m64  -mcmodel=medium -fPIC
+FFFLAGS=  -O -m64  -mcmodel=medium -fPIC -fimplicit-none
 #FFFLAGS=  -g
 
 
@@ -80,7 +80,7 @@ RL=ranlib
 RLFLAGS=
 
 # Linux
-LIBS=-ljadamilu  -llapack -lblas -lm -lc 
+LIBS=-ljadamilu -lamd -llapack -lblas -lm -lc 
 
 
 # -------------------------------
