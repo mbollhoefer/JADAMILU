@@ -19,3 +19,7 @@ fprintf('Number of MATVEC needed: %5d ;  Estimated gap: %12.4e ;  INFO: %d\n',..
 	PJDoptions.niter, PJDoptions.gap, PJDoptions.info);
 
 fprintf('Suggested DROPTOL if restart needed: %8.1e\n', PJDoptions.droptol);
+
+
+% similar command using MATLAB eigs function
+% [Veigs, Lambdaeigs]=eigs(A,M,maxeig,'sr');[~,I]=sort(diag(Lambdaeigs)); Veigs=Veigs(:,I); Lambdaeigs=Lambdaeigs(I,I); diag(Lambdaeigs)

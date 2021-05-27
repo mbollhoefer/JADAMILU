@@ -330,37 +330,41 @@ if nargin==6
 end
 
 
-dgl=sign(diag(A));
-I=find(dgl==0);
-dgl(I)=1;
-Dgl=spdiags(realmin*dgl,0,n,n);
+Adgl=sign(diag(A));
+I=find(Adgl==0);
+Adgl(I)=1;
+ADgl=spdiags(realmin*Adgl,0,n,n);
 % M,GEP,k,strategy, options, EXPREC
 if ~GEP
    if ~EXPREC
       if isreal(A)
-         [V,D,options]=DSYMjadamilu(A+Dgl,k,sigma,options);
+         [V,D,options]=DSYMjadamilu(A+ADgl,k,sigma,options);
       else
-         [V,D,options]=ZHERjadamilu(A+Dgl,k,sigma,options);
+         [V,D,options]=ZHERjadamilu(A+ADgl,k,sigma,options);
       end
    else
       if isreal(A)
-         [V,D,options]=DSYMjadamilurevcom(A+Dgl,k,sigma,options,PRECNAME);
+         [V,D,options]=DSYMjadamilurevcom(A+ADgl,k,sigma,options,PRECNAME);
       else
-         [V,D,options]=ZHERjadamilurevcom(A+Dgl,k,sigma,options,PRECNAME);
+         [V,D,options]=ZHERjadamilurevcom(A+ADgl,k,sigma,options,PRECNAME);
       end
    end
-else
+else % GEP
+   Mdgl=sign(diag(M));
+   I=find(Mdgl==0);
+   Mdgl(I)=1;
+   MDgl=spdiags(realmin*Mdgl,0,n,n);
    if ~EXPREC
       if isreal(A)
-         [V,D,options]=DSYMjadamilu_gep(A+Dgl,M,k,sigma,options);
+         [V,D,options]=DSYMjadamilu_gep(A+ADgl,M+MDgl,k,sigma,options);
       else
-         [V,D,options]=ZHERjadamilu_gep(A+Dgl,M,k,sigma,options);
+         [V,D,options]=ZHERjadamilu_gep(A+ADgl,M+MDgl,k,sigma,options);
       end
    else
       if isreal(A)
-         [V,D,options]=DSYMjadamilurevcom_gep(A+Dgl,M,k,sigma,options,PRECNAME);
+         [V,D,options]=DSYMjadamilurevcom_gep(A+ADgl,M+MDgl,k,sigma,options,PRECNAME);
       else
-         [V,D,options]=ZHERjadamilurevcom_gep(A+Dgl,M,k,sigma,options,PRECNAME);
+         [V,D,options]=ZHERjadamilurevcom_gep(A+ADgl,M+MDgl,k,sigma,options,PRECNAME);
       end
    end
 end
