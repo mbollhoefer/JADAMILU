@@ -10,7 +10,7 @@
     Example:
 
     % STANDARD JADAMILU call
-    [V,D,options] = ZHERjadamilu(A,k,sigma,options);
+    [V,D,options] = ZHERjadamilu_gep(A,M,k,sigma,options);
 
 
 
@@ -51,7 +51,7 @@
 #define MAX(A,B) (((A)>=(B))?(A):(B))
 #define MIN(A,B) (((A)>=(B))?(B):(A))
 
-/* #define PRINT_INFO  */
+#define PRINT_INFO /*  */
 
 /* ========================================================================== */
 /* === mexFunction ========================================================== */
@@ -78,7 +78,7 @@ void mexFunction
                *k_input, *sigma_input, *V_output, *D_output, *V0, *A_output,
                *M_input;
     char       *pdata, *input_buf, *output_buf;
-    int        ifield, status, nfields, i,j,k,l,nnz,nnzM;
+    int        ifield, status, nfields, i,j,k,l,nnz, nnzM;
     integer    *ia, *ja, *im, *jm, maxeig, ninit, iprint, isearch, iter, madspace, disp,
                info, lx, neig, icntl[5],n;
     size_t     sizebuf;
@@ -128,9 +128,12 @@ void mexFunction
 	    k=A_ja[j];
 	    if (k>=i) {
 	       ja[l]=k+1;
-	       a[l].r=A_valuesR[j];
+	       if (A_valuesR!=NULL)
+		  a[l].r=A_valuesR[j];
+	       else
+		  a[l].r=0.0;
 	       if (k==i)
-		  a[l].i=0;
+		  a[l].i=0.0;
 	       else if (A_valuesI!=NULL)
 		  a[l].i=-A_valuesI[j]; /* MATLAB stores matrices by columns */
 	       l++;
@@ -144,7 +147,7 @@ void mexFunction
     /* The second input must be a sparse square matrix.*/
     M_input=(mxArray *)prhs[1];
     if (!mxIsSparse(M_input))
-       mexErrMsgTxt("First input must be a sparse matrix.");
+       mexErrMsgTxt("Second input must be a sparse matrix.");
     mrows=mxGetM(M_input);
     ncols=mxGetN(M_input);
     if (mrows!=ncols || mrows!=n) {
@@ -169,13 +172,16 @@ void mexFunction
     jm=(integer *)      mxCalloc((size_t)nnzM, (size_t)sizeof(integer));
     m =(doublecomplex *)mxCalloc((size_t)nnzM, (size_t)sizeof(doublecomplex));
     l=0;
-    ia[0]=1;
+    im[0]=1;
     for (i=0; i<n; i++) {
         for (j=M_ia[i]; j<M_ia[i+1]; j++) {
 	    k=M_ja[j];
 	    if (k>=i) {
-	       ja[l]=k+1;
-	       m[l].r=M_valuesR[j];
+	       jm[l]=k+1;
+	       if (M_valuesR!=NULL)
+		  m[l].r=M_valuesR[j];
+	       else
+		  m[l].r=0.0;
 	       if (k==i)
 		  m[l].i=0;
 	       else if (M_valuesI!=NULL)
@@ -250,7 +256,7 @@ void mexFunction
        mxFree(input_buf);
     }
     else
-       mexErrMsgTxt("Third input must either be a number or a character");
+       mexErrMsgTxt("Fourth input must either be a number or a character");
 
 #ifdef PRINT_INFO
     mexPrintf("isearch=%d, sigma=%8.1e, sign=%8.1le\n",isearch,sigma,sign);
@@ -354,9 +360,12 @@ void mexFunction
     lx=n*(4*madspace+2*maxeig+1)+4*madspace*madspace;
     X=(doublecomplex *)mxCalloc((size_t)lx,sizeof(doublecomplex));
     /* init with initial eigenvector guesses */
-    j=0;
-    for (; j<n*ninit; j++)
-        X[j].r=pr[j];
+    if (pr!=NULL)
+       for (j=0; j<n*ninit; j++)
+	   X[j].r=pr[j];
+    else
+       for (j=0; j<n*ninit; j++)
+	   X[j].r=0.0;
     if (pi!=NULL)
        for (j=0; j<n*ninit; j++)
 	   X[j].i=pi[j];
