@@ -1,5 +1,5 @@
 /* ========================================================================== */
-/* === AMGinit mexFunction ================================================== */
+/* === JADAMILU mexFunction ================================================= */
 /* ========================================================================== */
 
 /*
@@ -130,11 +130,11 @@ void mexFunction
     mrows=mxGetM(k_input);
     ncols=mxGetN(k_input);
     if (mrows*ncols!=1) {
-       mexErrMsgTxt("Second input must be a scalar.");
+       mexErrMsgTxt("Third input must be a scalar.");
     }
     maxeig=*mxGetPr(k_input);
     if (maxeig<0 || maxeig>n)
-       mexErrMsgTxt("Second input between 1 and n");
+       mexErrMsgTxt("Third input between 1 and n");
 #ifdef PRINT_INFO
     mexPrintf("k=%d\n",maxeig);
 #endif
