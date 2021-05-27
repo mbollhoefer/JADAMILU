@@ -133,7 +133,7 @@ binaries (which have an ending like *.mex*) along with JADAMILU's two
 MATLAB drivers "PJDinit.m", which is used to init your parameters to the
 default values and "PJD.m" which is JADAMILU's eigensolver call. "PJD.m"
 is set up along the MATLAB "eigs" function. There are two sample codes
-"example1.m" and "example2.m" which demonstrate the usage of PJDinit and PJD
+"example1.m",...,"example3.m" which demonstrate the usage of PJDinit and PJD
 
 
 
