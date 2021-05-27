@@ -106,7 +106,7 @@ and use gfortran compiler, EXAMPLE1.f will be compiled with
 > gfortran EXAMPLE1.f  -L ../lib/INT32GNU -ljadamilu -lamd -lsuitesparseconfig -llapack -lblas ../lib/INT32GNU/MC*.o
 
 Similarly, 
-> gfortran -m64 -fdefault-integer-8 -mcmodel=medium EXAMPLE1.f  -L ../lib/INT64NGNU -ljadamilu -lamd -lsuitesparseconfig -llapack -lblas ../lib/INT64NGNU/MC*.o
+> gfortran -m64 -fdefault-integer-8 -mcmodel=medium EXAMPLE1.f  -L ../lib/INT64YGNU -ljadamilu -lamd -lsuitesparseconfig -llapack -lblas ../lib/INT64YGNU/MC*.o
 would refer to long address space and 64 bit long integer
 
 Of course, you may insert your favorite options, like "-O" for optimization
