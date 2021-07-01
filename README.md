@@ -16,7 +16,7 @@ dependent upon the use of the package.
 You shall use reasonable endeavors to notify the authors of 
 the package of this publication. 
 
-
+For more information please visit http://homepages.ulb.ac.be/~jadamilu/.
 
 ----------------------------------------------------------------------
 
