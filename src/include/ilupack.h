@@ -2830,9 +2830,14 @@ void   ipsrandom(unsigned integer *);
 
 /* global variable to measure the timings of the components within ILUPACK */
 #define ILUPACK_secnds_length   10
-    doubleprecision ILUPACK_secnds[ILUPACK_secnds_length];
 #define ILUPACK_mem_length      20
+#ifdef _ILUPACK_DEFINE_GLOBALS_
+    doubleprecision ILUPACK_secnds[ILUPACK_secnds_length];
     size_t ILUPACK_mem[ILUPACK_mem_length];
+#else
+    extern doubleprecision ILUPACK_secnds[ILUPACK_secnds_length];
+    extern size_t ILUPACK_mem[ILUPACK_mem_length];
+#endif
 /* ILUPACK_mem[0]      maxmimum logical size of ibuff             (integer)
    ILUPACK_mem[1]      maxmimum logical size of dbuff             (FLOAT)
 
