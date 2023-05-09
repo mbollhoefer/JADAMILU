@@ -1,0 +1,7 @@
+a simple call using gfortran could look like this
+
+gfortran -O4 -fPIC -m64 -fdefault-integer-8 -mcmodel=medium -fopenmp -fallow-argument-mismatch -fallow-invalid-boz -oEXAMPLE1.out EXAMPLE1.f -L ../lib/INT64YGNU/ -ljadamilu -lamd -lsuitesparseconfig -llapack -lblas ../lib/INT64YGNU/*.o
+
+This would refer to the makefile setting $(JADAMILU)/src/makefiles/makefile.includeINT64YGNU
+
+For other platforms/compilers refer to the other makefiles in $(JADAMILU)/src/makefiles/
