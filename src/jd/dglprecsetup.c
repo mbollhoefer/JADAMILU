@@ -1,4 +1,7 @@
 #include <string.h>
+#ifdef _DOUBLE_REAL_
+#define _ILUPACK_DEFINE_GLOBALS_
+#endif
 #include <ilupack.h>
 #include <ilupackmacros.h>
 
