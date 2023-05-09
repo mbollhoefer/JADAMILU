@@ -42,9 +42,11 @@ LONGINTEGER=
 # -------------------------------
 # which fortran compiler is used
 FF=gfortran
+FALLOW=-fallow-argument-mismatch -fallow-invalid-boz
+# FALLOW=
 # its flags
-FFFLAGS=  -O -fPIC
-#FFFLAGS=  -g
+ FFFLAGS=  -O -fPIC $(FALLOW)
+#FFFLAGS=  -g -fPIC $(FALLOW)
 
 
 # -------------------------------

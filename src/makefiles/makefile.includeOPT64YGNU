@@ -42,10 +42,11 @@ LONGINTEGER=-D_LONG_INTEGER_
 # -------------------------------
 # which fortran compiler is used
 FF=gfortran
+FALLOW=-fallow-argument-mismatch -fallow-invalid-boz
+# FALLOW=
 # its flags
-FFFLAGS=  -O4 -m64  -mcmodel=medium -fdefault-integer-8  -fPIC
-
-#FFFLAGS=  -g
+FFFLAGS=  -O4 -m64  -mcmodel=medium -fdefault-integer-8  -fPIC $(FALLOW)
+#FFFLAGS=  -g  -m64  -mcmodel=medium -fdefault-integer-8  -fPIC $(FALLOW)
 
 
 # -------------------------------
