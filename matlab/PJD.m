@@ -418,7 +418,6 @@ else % only mat-vec passed, then a preconditioner is mandatory
        else
           [V,D,options]=ZHERjadamilurevcom_matvec(ANAME,n,k,sigma,options,PRECNAME);
        end
-      end
    else % GEP
       Mdgl=sign(diag(M));
       I=find(Mdgl==0);

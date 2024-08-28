@@ -54,6 +54,4 @@ $(MEXDIR)/%.$(EXT): %.c ../lib/$(PLATFORM)/libjadamilu.a
 
 
 $(MEXDIR)/D*.$(EXT): ../lib/$(PLATFORM)/libjadamilu.a  
-$(MEXDIR)/D*.$(EXT): ../lib/$(PLATFORM)/libjadamilu.a  
-$(MEXDIR)/Z*.$(EXT): ../lib/$(PLATFORM)/libjadamilu.a 
 $(MEXDIR)/Z*.$(EXT): ../lib/$(PLATFORM)/libjadamilu.a 
