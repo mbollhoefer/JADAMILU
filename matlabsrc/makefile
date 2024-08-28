@@ -22,13 +22,18 @@ MEXDIR=../matlab
 DOBJECTS=$(MEXDIR)/DSYMjadamilu.$(EXT) \
          $(MEXDIR)/DSYMjadamilu_gep.$(EXT) \
          $(MEXDIR)/DSYMjadamilurevcom.$(EXT)\
-         $(MEXDIR)/DSYMjadamilurevcom_gep.$(EXT)
+         $(MEXDIR)/DSYMjadamilurevcom_gep.$(EXT)\
+         $(MEXDIR)/DSYMjadamilurevcom_matvec.$(EXT)\
+         $(MEXDIR)/DSYMjadamilurevcom_gep_matvec.$(EXT)
          
 
 ZOBJECTS=$(MEXDIR)/ZHERjadamilu.$(EXT) \
          $(MEXDIR)/ZHERjadamilu_gep.$(EXT) \
          $(MEXDIR)/ZHERjadamilurevcom.$(EXT) \
-         $(MEXDIR)/ZHERjadamilurevcom_gep.$(EXT)
+         $(MEXDIR)/ZHERjadamilurevcom_gep.$(EXT)\
+         $(MEXDIR)/ZHERjadamilurevcom_matvec.$(EXT) \
+         $(MEXDIR)/ZHERjadamilurevcom_gep_matvec.$(EXT)
+         
 
 OBJECTS=$(DOBJECTS) $(ZOBJECTS)
 
@@ -43,7 +48,7 @@ $(DOBJECTS): ../lib/$(PLATFORM)/libjadamilu.a
 $(ZOBJECTS): ../lib/$(PLATFORM)/libjadamilu.a 
 $(MEXDIR)/%.$(EXT): %.c ../lib/$(PLATFORM)/libjadamilu.a
 # 64 BIT ------------------------------
-# gcc/gfortran with mexopts77_gfortran.sh 
+# gcc/gfortran
 	$(CMEX) -O CFLAGS='$(CFLAGS) -fPIC -fopenmp' LDFLAGS='$(LDFLAGS) -fopenmp' -largeArrayDims -D_LONG_INTEGER_ $(FORTRANNAMES) -I../src/include -outdir $(MEXDIR)  $<  -L../lib/$(PLATFORM) -ljadamilu -lamd -lsuitesparseconfig -lmwlapack -lmwblas -lm -lc -lgfortran ../lib/$(PLATFORM)/*.o
 # 64 BIT ------------------------------
 

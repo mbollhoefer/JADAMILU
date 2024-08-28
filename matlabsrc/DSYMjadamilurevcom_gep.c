@@ -10,7 +10,7 @@
     Example:
 
     % STANDARD JADAMILU call
-    [V,D,options] = DSYMjadamilurevcom(A,k,sigma,options,PREC);
+    [V,D,options] = DSYMjadamilurevcom_gep(A,M,k,sigma,options,PREC);
 
 
 
@@ -86,8 +86,8 @@ void mexFunction
                tol, droptol, *X, *pr, gap, condest, *pin, *pout, *M_valuesR;
     mxArray    *lhs[1], *prec_rhs, *fname_output;
 
-    if (nrhs!=5)
-       mexErrMsgTxt("Five input arguments required.");
+    if (nrhs!=6)
+       mexErrMsgTxt("Six input arguments required.");
     else if (nlhs!=3)
        mexErrMsgTxt("Three output arguments are required.");
 
@@ -180,7 +180,7 @@ void mexFunction
        mxFree(input_buf);
     }
     else
-       mexErrMsgTxt("Third input must either be a number or a character");
+       mexErrMsgTxt("Fourth input must either be a number or a character");
 
 #ifdef PRINT_INFO
     mexPrintf("isearch=%d, sigma=%8.1e, sign=%8.1le\n",isearch,sigma,sign);
@@ -329,10 +329,10 @@ void mexFunction
 
 
 
-    /* Get fifth input argument */
-    precname_input=(mxArray *)prhs[4];
+    /* Get sixth input argument */
+    precname_input=(mxArray *)prhs[5];
     if (!mxIsChar(precname_input)) 
-       mexErrMsgTxt("Fifth input must be a string");
+       mexErrMsgTxt("Sixth input must be a string");
     buflen=(mxGetM(precname_input)*mxGetN(precname_input))+1;
     /* Allocate memory for input string. */
     precname=(char *)mxCalloc((size_t)buflen, (size_t)sizeof(char));

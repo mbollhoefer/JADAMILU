@@ -10,7 +10,7 @@
     Example:
 
     % STANDARD JADAMILU call
-    [V,D,options] = ZHERjadamilurevcom(A,M,k,sigma,options,PREC);
+    [V,D,options] = ZHERjadamilurevcom_matvec(ANAME,n,k,sigma,options,PREC);
 
 
 
@@ -20,11 +20,11 @@
 
     Date:
 
-	June 13, 2015. JADAMILU 2.0
+	September 02, 2024. JADAMILU 2.0
 
     Notice:
 
-	Copyright (c) 2015 by TU Braunschweig/Universite Libre de Bruxelles. 
+	Copyright (c) 2024 by TU Braunschweig/Universite Libre de Bruxelles. 
         All Rights Reserved.
 
 	THIS MATERIAL IS PROVIDED AS IS, WITH ABSOLUTELY NO WARRANTY
@@ -73,58 +73,45 @@ void mexFunction
     const char **fnames;       /* pointers to field names */
     const mwSize  *dims;
     mxClassID  *classIDflags;
-    mwSize     buflen, mrows, ncols, ndim, mydims[2], *A_ia,*A_ja, *M_ia, *M_ja;
-    mxArray    *tmp, *fout, *A_input, *options_input, *options_output, *precname_input,
-               *k_input, *sigma_input, *V_output, *D_output, *V0, *A_output,
-               *M_input;
-    char       *pdata, *input_buf, *output_buf, *precname;
+    mwSize     buflen, mrows, ncols, ndim, mydims[2], *D_ia,*D_ja;
+    mxArray    *tmp, *fout, *aname_input, *n_input, *options_input, *options_output,
+               *precname_input, *k_input, *sigma_input, *V_output, *D_output, *V0;
+    char       *pdata, *input_buf, *output_buf, *aname, *precname;
     int        ifield, status, nfields, i,j,k,l,nnz;
     integer    maxeig, ninit, iprint, isearch, iter, madspace, disp,
-               info, lx, neig, icntl[5],n,ijob, ndx1, ndx2, ndx3;
+               info, lx, neig, icntl[5],n,ijob, ndx1, ndx2;
     size_t     sizebuf;
-    double     dbuf, *A_valuesR, *A_valuesI, *eigs, *res, mem, sigma, shift, sign,
-               tol, droptol,  *pr, *pi, gap, condest, *M_valuesR, *M_valuesI;
-    mxArray    *lhs[1], *prec_rhs, *fname_output;
+    double     dbuf, *D_valuesR, *eigs, *res, mem, sigma, shift, sign,
+               tol, droptol,  *pr, *pi, gap, condest;
+    mxArray    *lhs[1], *a_prec_rhs, *fname_output;
     doublecomplex *X, *pin, *pout;
 
     if (nrhs!=6)
-       mexErrMsgTxt("Six input arguments required.");
+       mexErrMsgTxt("Sixth input arguments required.");
     else if (nlhs!=3)
        mexErrMsgTxt("Three output arguments are required.");
 
 
 
-    /* The first input must be a sparse square matrix.*/
-    A_input=(mxArray *)prhs[0];
-    if (!mxIsSparse(A_input))
-       mexErrMsgTxt("First input must be a sparse matrix.");
-    mrows=mxGetM(A_input);
-    ncols=mxGetN(A_input);
-    if (mrows!=ncols) {
-       mexErrMsgTxt("First input must be a square matrix.");
-    }
-    A_ja     =(mwIndex *)mxGetIr(A_input);
-    A_ia     =(mwIndex *)mxGetJc(A_input);
-    A_valuesR=(double *) mxGetPr(A_input);
-    A_valuesI=(double *) mxGetPi(A_input);
-
-    n=ncols;
+    /* The first input must be a function name of A */
+    aname_input=(mxArray *)prhs[0];
+    if (!mxIsChar(aname_input)) 
+       mexErrMsgTxt("First input must be a string");
+    buflen=(mxGetM(aname_input)*mxGetN(aname_input))+1;
+    /* Allocate memory for input string. */
+    aname=(char *)mxCalloc((size_t)buflen, (size_t)sizeof(char));
+    mxGetString(aname_input, aname, buflen);
+#ifdef PRINT_INFO
+    mexPrintf("function A name: %s\n",aname); fflush(stdout);
+#endif    
 
 
-    /* The second input must be a sparse square matrix.*/
-    M_input=(mxArray *)prhs[1];
-    if (!mxIsSparse(M_input))
-       mexErrMsgTxt("Second input must be a sparse matrix.");
-    mrows=mxGetM(M_input);
-    ncols=mxGetN(M_input);
-    if (mrows!=ncols || mrows!=n) {
-       mexErrMsgTxt("Second input must be a square matrix.");
-    }
-    M_ja     =(mwIndex *)mxGetIr(M_input);
-    M_ia     =(mwIndex *)mxGetJc(M_input);
-    M_valuesR=(double *) mxGetPr(M_input);
-    M_valuesI=(double *) mxGetPi(M_input);
-
+    /* The second input must be the matrix size */
+    n_input=(mxArray *)prhs[1];
+    if (!mxIsNumeric(n_input))
+       mexErrMsgTxt("Second input must be a number");
+    n=*mxGetPr(n_input);
+   
 
     /* Get third input argument */
     k_input=(mxArray *)prhs[2];
@@ -189,10 +176,11 @@ void mexFunction
     mexPrintf("isearch=%d, sigma=%8.1e, sign=%8.1le\n",isearch,sigma,sign);
 #endif
 
+    
     /* Get fifth input argument */
     options_input=(mxArray *)prhs[4];
     if (!mxIsStruct(options_input)) 
-       mexErrMsgTxt("Fifth input must be a structure");
+       mexErrMsgTxt("Fourth input must be a structure");
     nfields = mxGetNumberOfFields(options_input);
 
     /* Allocate memory  for storing classIDflags */
@@ -344,7 +332,7 @@ void mexFunction
 
 
 
-    /* Get Sixth input argument */
+    /* Get sixth input argument */
     precname_input=(mxArray *)prhs[5];
     if (!mxIsChar(precname_input)) 
        mexErrMsgTxt("Sixth input must be a string");
@@ -353,7 +341,7 @@ void mexFunction
     precname=(char *)mxCalloc((size_t)buflen, (size_t)sizeof(char));
     mxGetString(precname_input, precname, buflen);
 #ifdef PRINT_INFO
-    mexPrintf("function preconditioner name: %s\n",precname); fflush(stdout);
+    mexPrintf("function name: %s\n",precname); fflush(stdout);
 #endif    
 
 
@@ -365,85 +353,50 @@ void mexFunction
 
     mydims[0]=n;
     mydims[1]=1;
-    prec_rhs=(mxArray *)mxCreateNumericArray(2, mydims, mxDOUBLE_CLASS, mxCOMPLEX);
+    a_prec_rhs=(mxArray *)mxCreateNumericArray(2, mydims, mxDOUBLE_CLASS, mxCOMPLEX);
     do {
 #ifdef PRINT_INFO
        mexPrintf("call JDREVCOM\n"); fflush(stdout);
 #endif
-       zjdrevcom_gep(&n,eigs, res, X, &lx, &neig, &sigma, &isearch, &ninit, 
-		     &madspace, &iter, &tol, &ijob, &ndx1, &ndx2, &ndx2, 
-		     &iprint, &info, &gap);
-       if (ijob==1 || ijob==3 || ijob==4) {
-	  if (ijob==1 || ijob==3) {
+       zjdrevcom(&n,eigs, res, X, &lx, &neig, &sigma, &isearch, &ninit, 
+	         &madspace, &iter, &tol, &ijob, &ndx1, &ndx2, &iprint, &info, 
+    	         &gap);
+       if (ijob==1) {
 #ifdef PRINT_INFO
-	     mexPrintf("call mat-vec A\n"); fflush(stdout);
+          mexPrintf("call mat-vec\n"); fflush(stdout);
 #endif
-	     /* matrix-vector multiplication with A */
-	     /* X(ndx1-1:ndx1+n-1) input,  X(ndx2-1:ndx2+n-1) output */
-	     pin =X+(ndx1-1);
-	     pout=X+(ndx2-1);
-	     if (A_valuesI!=NULL) {
-	        for (i=0; i<n; i++) {
-		    pout[i].r=0.0;
-		    pout[i].i=0.0;
-		    for (j=A_ia[i]; j<A_ia[i+1]; j++) {
-		        k=A_ja[j];
-			/* MATLAB stores matrices by columns */
-			pout[i].r+=A_valuesR[j]*pin[k].r+A_valuesI[j]*pin[k].i;
-			pout[i].i+=A_valuesR[j]*pin[k].i-A_valuesI[j]*pin[k].r;
-		    }
-		    pout[i].r*=sign;
-		    pout[i].i*=sign;
-		}
-	     }
-	     else {
-	        for (i=0; i<n; i++) {
-		    pout[i].r=0.0;
-		    pout[i].i=0.0;
-		    for (j=A_ia[i]; j<A_ia[i+1]; j++) {
-		        k=A_ja[j];
-			pout[i].r+=A_valuesR[j]*pin[k].r;
-			pout[i].i+=A_valuesR[j]*pin[k].i;
-		    }
-		    pout[i].r*=sign;
-		    pout[i].i*=sign;
-		}
-	     }
-	  } /* end if ijob==1 || ijob==3 */
+          /* matrix-vector multiplication */
+          /* X(ndx1-1:ndx1+n-1) input,  X(ndx2-1:ndx2+n-1) output */
+          pin =X+(ndx1-1);
+          pout=X+(ndx2-1);
 
-	  if (ijob==1 || ijob==4) {
-#ifdef PRINT_INFO
-	     mexPrintf("call mat-vec M\n"); fflush(stdout);
-#endif
-	     /* matrix-vector multiplication with M */
-	     /* X(ndx1-1:ndx1+n-1) input,  X(ndx3-1:ndx3+n-1) output */
-	     pin =X+(ndx1-1);
-	     pout=X+(ndx3-1);
-	     if (M_valuesI!=NULL) {
-	        for (i=0; i<n; i++) {
-		    pout[i].r=0.0;
-		    pout[i].i=0.0;
-		    for (j=M_ia[i]; j<M_ia[i+1]; j++) {
-		        k=M_ja[j];
-			/* MATLAB stores matrices by columns */
-			pout[i].r+=M_valuesR[j]*pin[k].r+M_valuesI[j]*pin[k].i;
-			pout[i].i+=M_valuesR[j]*pin[k].i-M_valuesI[j]*pin[k].r;
-		    }
-		}
-	     }
-	     else {
-	        for (i=0; i<n; i++) {
-		    pout[i].r=0.0;
-		    pout[i].i=0.0;
-		    for (j=M_ia[i]; j<M_ia[i+1]; j++) {
-		        k=M_ja[j];
-			pout[i].r+=M_valuesR[j]*pin[k].r;
-			pout[i].i+=M_valuesR[j]*pin[k].i;
-		    }
-		}
-	     }
-	  } /* end if ijob==1 || ijob==4 */
-       } /* end if ijob==1 || ijob==3 || ijob==4 */
+	  /* copy pin -> a_prec_rhs */
+	  pr=mxGetPr(a_prec_rhs);
+	  pi=mxGetPi(a_prec_rhs);
+          for (i=0; i<n; i++) {
+	      pr[i]=pin[i].r;
+	      pi[i]=pin[i].i;
+          }
+
+	  mexCallMATLAB(1,lhs,1,&a_prec_rhs, aname);
+
+	  /* copy lhs -> pout */
+	  pr=mxGetPr(lhs[0]);
+	  pi=mxGetPi(lhs[0]);
+          for (i=0; i<n; i++) {
+	      pout[i].r=sign*pr[i];
+          }
+	  if (pi!=NULL) {
+             for (i=0; i<n; i++) {
+                 pout[i].i=sign*pi[i];
+             }
+          }
+	  else {
+             for (i=0; i<n; i++) {
+                 pout[i].i=0.0;
+             }
+          }
+       }
        else if (ijob==2) {
 #ifdef PRINT_INFO
 	  mexPrintf("apply precnd.\n"); fflush(stdout);
@@ -453,15 +406,15 @@ void mexFunction
           pin =X+(ndx2-1);
           pout=X+(ndx1-1);
 
-	  /* copy pin -> prec_rhs */
-	  pr=mxGetPr(prec_rhs);
-	  pi=mxGetPi(prec_rhs);
+	  /* copy pin -> a_prec_rhs */
+	  pr=mxGetPr(a_prec_rhs);
+	  pi=mxGetPi(a_prec_rhs);
           for (i=0; i<n; i++) {
 	      pr[i]=pin[i].r;
 	      pi[i]=pin[i].i;
           }
 
-	  mexCallMATLAB(1,lhs,1,&prec_rhs, precname);
+	  mexCallMATLAB(1,lhs,1,&a_prec_rhs, precname);
 
 	  /* copy lhs -> pout */
 	  pr=mxGetPr(lhs[0]);
@@ -482,6 +435,7 @@ void mexFunction
       }
     }
     while (ijob!=0);
+    mxFree(aname);
     mxFree(precname);
 
 #ifdef PRINT_INFO
@@ -518,15 +472,15 @@ void mexFunction
     /* Create a neig x neig sparse matrix for output */
     plhs[1]=mxCreateSparse((mwSize)neig,(mwSize)neig, (mwSize)neig, mxREAL);
     D_output=plhs[1];
-    A_ja     =(mwIndex *)mxGetIr(D_output);
-    A_ia     =(mwIndex *)mxGetJc(D_output);
-    A_valuesR=(double *) mxGetPr(D_output);
+    D_ja     =(mwIndex *)mxGetIr(D_output);
+    D_ia     =(mwIndex *)mxGetJc(D_output);
+    D_valuesR=(double *) mxGetPr(D_output);
     for (i=0; i<neig; i++) {
-        A_ia[i]=i;
-        A_ja[i]=i;
-        A_valuesR[i]=sign*eigs[i];
+        D_ia[i]=i;
+        D_ja[i]=i;
+        D_valuesR[i]=sign*eigs[i];
     }
-    A_ia[neig]=neig;
+    D_ia[neig]=neig;
     mxFree(eigs);
 #ifdef PRINT_INFO
     mexPrintf("eigenvalues passed\n"); fflush(stdout);
