@@ -37,17 +37,109 @@ function [V,D,options] = PJD(A,sizea,M,k,sigma,options,PREC)
 % your own preconditioner 'PREC'
 
 
+
+  
+optionsin=PJDinit(A);
+% check trivial 1x1 eigenvalue problem for consistency
+if isa(A,'function_handle') || isstr(A)
+   if nargin<2
+      fprintf('if a string or function handle is passed as A, then you must provide as second parameter its scalar dimension\n');
+      return
+   end % if
+   n=sizea;
+
+   % PJD(A,sizea,M,k,   sigma,options,PREC)
+   % or
+   % PJD(A,sizea,k,     sigma,options,PREC)
+
+   if n==1
+      % k or M? Both have to be 1x1
+      if nargin>=3
+	 if size(M,1)~=1 || size(M,2)~=1
+	    fprintf('third input must be a scalar\n');
+	    return
+	 end
+      end % if
+
+      options=optionsin;
+      options.niter=0;
+      options.info=0;
+      options.res=0;
+      V=1;
+      if isa(A,'function_handle')
+	 D=A(1);
+      else
+	 D=feval(A,1);
+      end % if-else
+      % PJD(A,sizea)
+      if nargin==2
+	 return
+      % PJD(A,sizea,M,...) or PJD(A,sizea,k,...)
+      % if k is provided, only k==1 makes sense
+      elseif nargin>=3
+	 if M==1
+	    return
+	 else
+            D=D/M;
+	    return
+	 end
+      end % if
+   end % if
+   
+else
+   % PJD(A,M,k,   sigma,options,PREC)
+   % or
+   % PJD(A,k,     sigma,options,PREC)
+   n=size(A,1);
+   if n==1
+      % k or M? Both have to be 1x1
+      if nargin>=2
+	 if size(M,1)~=1 || size(M,2)~=1
+	    fprintf('second input must be a scalar\n');
+	    return
+	 end
+      end % if
+
+      options=optionsin;
+      options.niter=0;
+      options.info=0;
+      options.res=0;
+      V=1;
+      D=A;
+      % PJD(A)
+      if nargin==1
+	 return
+      % PJD(A,M,...) or PJD(A,k,...)
+      % if k is provided, only k==1 makes sense
+      elseif nargin>=2
+	 if M==1
+      	    return
+	 else
+            D=D/M;
+	    return
+	 end
+      end % if
+   end % if
+end
+% END trivial 1x1 case
+
+
+
+
 % flag for generalized eigenvalue problem
-GEP=0;
+GEP=1;
 
 % flag for external preconditioning
 EXPREC=0;
 
-% strategy where to seek for eigenvalues
-strategy='l';
-
 flag_matvec=0;
+sigmain='l';
 if isa(A,'function_handle') || isstr(A)
+   if nargin<2
+      fprintf('if a string or function handle is passed as A, then you must provide as second parameter its scalar dimension\n');
+      return
+   end % if
+
    flag_matvec=1;
    if isa(A,'function_handle')
       ANAME=func2str(A);
@@ -55,314 +147,180 @@ if isa(A,'function_handle') || isstr(A)
       ANAME=A;
    end % if-else
    n=sizea;
-else % matrix explicitly given, no sizea
-   % shift input variables
-   if nargin>=6
-      PREC=options;  
-   end 
-   if nargin>=5
-      options=sigma;  
-   end 
-   if nargin>=4
-      sigma=k;  
-   end 
-   if nargin>=3
-      k=M;
-   end 
-   if nargin>=2
-      M=sizea;
-   end
+   kin=min(n,6);
    
+   if size(sizea,1)~=1 || size(sizea,2)~=1
+      fprintf('if a string or function handle is passed as A, then the next parameter must be its scalar dimension\n');
+      return;
+   end % if
+   
+   % check whether M is passed or not
+   % no, and no further input
+   if nargin<3
+      GEP=0;
+      k=kin;
+      sigma=sigmain;   
+      options=optionsin;
+   else % nargin>=3
+      % no, but something else, thus shift!
+      if size(M,1)~=n || size(M,2)~=n
+	 GEP=0;
+         % shift input variables
+	 if nargin>=6
+	    PREC=options;
+	    EXPREC=1;
+	 end 
+	 if nargin>=5
+	    options=sigma;
+	 else
+	    options=optionsin;
+	 end 
+	 if nargin>=4
+	    sigma=k;
+	 else
+	    sigma=sigmain;   
+	 end 
+	 k=M;
+      end % if
+   end % if-else
+else % matrix explicitly given, no sizea
+
    n=size(A,1);
-   if norm(A-A',inf)~=0 || size(A,2)~=n
+   kin=min(n,6);
+   
+   if ~ishermitian(A)
       disp('A must be a square symmetrix(Hermitian) matrix');
       return
    end
+   
+   % check whether M is passed or not
+   % no, and no further input
+   if nargin<2
+      GEP=0;
+      k=kin;
+      sigma=sigmain;   
+      options=optionsin;
+   else % nargin>=2
+      % no, but something else, thus shift!
+      if size(sizea,1)~=n || size(sizea,2)~=n
+	 GEP=0;
+	 % shift input variables without M
+         if nargin>=5
+            PREC=sigma;  
+	    EXPREC=1;
+         end 
+         if nargin>=4
+            options=k;
+	 else
+	    options=optionsin;
+         end 
+         if nargin>=3
+            sigma=M;  
+	 else
+	    sigma=sigmain;   
+         end 
+         k=sizea;
+      else % yes
+         % shift input variables respecting M
+         if nargin>=6
+            PREC=options;  
+	    EXPREC=1;
+         end 
+         if nargin>=5
+            options=sigma;
+	 else
+	    options=optionsin;
+	 end 
+	 if nargin>=4
+	    sigma=k;  
+	 else
+	    sigma=sigmain;   
+	 end 
+	 if nargin>=3
+	    k=M;
+	 else
+	    k=kin;
+	 end
+	 M=sizea;
+      end % if
+   end % if-else
 end % if
 
 
 
-% PJD(A)
-if nargin==1+flag_matvec
-   k=min(n,6);
-   M=[];
+
+
+% check M
+if GEP
+   if ~ishermitian(M)
+      disp('M must be a square symmetrix(Hermitian) matrix of same size as A')
+      return
+   end
 end
-if nargin>=2+flag_matvec
-   Min=M;
+
+
+% check k
+if k~=round(k) || k<=0 || k>n
+   disp('k must be a positive integer between 1 and n')
+   return
 end
-if nargin>=3+flag_matvec
-   kin=k;
+
+% check sigma
+if isstr(sigma)
+   if sigma=='l' || sigma=='L'
+      strategy='l';
+   elseif sigma=='s' || sigma=='S'
+      strategy='s';
+   else
+      disp('string sigma must be either `l´ or `s´')
+      return
+   end
 else
-   k=6;   
-end
-if nargin>=4+flag_matvec
-   sigmain=sigma;
-else
-   sigma='l';   
-end
-% default options
-myoptions=PJDinit(A);
-if nargin>=5+flag_matvec
-   optionsin=options;
-else
-   options=myoptions;
-end
-
-
-% PJD(A,M) or PJD(A,k) or PJD(A,[])
-% check second argument
-if nargin>=2+flag_matvec
-   % M might be provided (or k)
-   if ~isempty(M)
-      % trivial
-      if n==1 
-	 if size(M,1)==n && size(M,2)==n
-	    V=1; D=A/M;
-	    if nargout==3
-	       options.niter=0;
-	       options.res=0;
-	       options.info=0;
-	    end
-	    return
-	 else
-	    disp('M must be a square symmetrix(Hermitian) matrix of same size as A')
-	    return
-	 end
-      elseif size(M,1)==n && size(M,2)==n
-	 GEP=1;
-	 k=6;
-	 if norm(M-M',inf)~=0
-	    disp('M must be a square symmetrix(Hermitian) matrix of same size as A')
-	    return
-	 end
-      elseif size(M,1)==1 && size(M,2)==1
-	 k=M; M=[];
-	 if k~=round(k) || k<=0 || k>n
-	    disp('k must be a positive integer between 1 and n')
-	    return
-	 end
-      else
-         disp('M must be a square symmetrix(Hermitian) matrix of same size as A')
-	 return
-      end
-   else
-      k=6;
+   strategy=sigma;
+   if ~isnumeric(strategy) || size(strategy,1)~=1 || ...
+      size(strategy,2)~=1  || ~isreal(strategy)
+      disp('sigma must be a real scalar')
+      return
    end
 end
 
-% PJD(A,M,k) or PJD(A,k,sigma) or PJD(A,[],k)
-% check third argument
-if nargin>=3+flag_matvec
-   % PJD(A,M,k,...)
-   if ~isempty(M)
-      k=kin;
-      if k~=round(k) || k<=0 || k>n
-	 disp('k must be a positive integer between 1 and n')
-	 return
-      end
-   % PJD(A,k,sigma,...) or PJD(A,[],k,...)
+% check options
+if ~isfield(options, 'madspace')
+    options.madspace=optionsin.madspace;
+end   
+if ~isfield(options, 'maxit')
+   options.maxit=optionsin.maxit;
+end   
+if ~isfield(options, 'restol')
+   options.restol=optionsin.restol;
+end   
+if ~isfield(options, 'disp')
+   options.disp=optionsin.disp;
+end   
+if ~isfield(options, 'V0')
+   options.V0=optionsin.V0;
+end   
+if ~isfield(options, 'mem')
+   options.mem=optionsin.mem;
+end   
+if ~isfield(options, 'droptol')
+   options.droptol=optionsin.droptol;
+end   
+if ~isfield(options, 'condest')
+   options.condest=optionsin.condest;
+end   
+
+% check PREC (as far as it exists)
+if EXPREC
+   if isa(PREC,'function_handle')
+      PRECNAME=func2str(PREC);
+   elseif isstr(PREC)
+      PRECNAME=PREC;
    else
-      if ~isempty(Min) 
-	 k=Min;
-	 sigma=kin;
-	 if isstr(sigma)
-	    if sigma=='l' || sigma=='L'
-	       strategy='l';
-	    elseif sigma=='s' || sigma=='S'
-	       strategy='s';
-	    else
-	       disp('string sigma must be either `l´ or `s´')
-	       return
-	    end
-	 else
-	    strategy=sigma;
-	    if (~isnumeric(strategy) || size(strategy,1)~=1 || ...
-		size(strategy,2)~=1  || ~isreal(strategy))
-	       disp('sigma must be a real scalar')
-	       return
-	    end
-	 end
-      else % isempty(Min) => PJD(A,[],k)
-	 k=kin;
-	 if k~=round(k) || k<=0 || k>n
-	    disp('k must be a positive integer between 1 and n')
-	    return
-	 end
-      end
-   end
-end
-
-
-% PJD(A,M,k,sigma) or PJD(A,k,sigma,options) or PJD(A,[],k,sigma)
-% check fourth argument
-if nargin>=4+flag_matvec
-   % PJD(A,M,k,sigma)
-   if ~isempty(M)
-      sigma=sigmain;
-      if isstr(sigma)
-	 if sigma=='l' || sigma=='L'
-	    strategy='l';
-	 elseif sigma=='s' || sigma=='S'
-	    strategy='s';
-	 else
-	    disp('string sigma must be either `l´ or `s´')
-	    return
-	 end
-      else
-	 strategy=sigma;
-	 if (~isnumeric(strategy) || size(strategy,1)~=1 || ...
-	     size(strategy,2)~=1  || ~isreal(strategy))
-	    disp('sigma must be a real scalar')
-	    return
-	 end
-      end
-   % PJD(A,k,sigma,options) or PJD(A,[],k,sigma)
-   else
-      % PJD(A,k,sigma,options)
-      if ~isempty(Min)
-	 options=sigmain;
-	 if ~isfield(options, 'madspace')
-	    options.madspace=myoptions.madspace;
-	 end   
-	 if ~isfield(options, 'maxit')
-	    options.maxit=myoptions.maxit;
-	 end   
-	 if ~isfield(options, 'restol')
-	    options.restol=myoptions.restol;
-	 end   
-	 if ~isfield(options, 'disp')
-	    options.disp=myoptions.disp;
-	 end   
-	 if ~isfield(options, 'V0')
-	    options.V0=myoptions.V0;
-	 end   
-	 if ~isfield(options, 'mem')
-	    options.mem=myoptions.mem;
-	 end   
-	 if ~isfield(options, 'droptol')
-	    options.droptol=myoptions.droptol;
-	 end   
-	 if ~isfield(options, 'condest')
-	    options.condest=myoptions.condest;
-	 end   
-	 
-      % PJD(A,[],k,sigma)
-      else
-	 sigma=sigmain;
-	 if isstr(sigma)
-	    if sigma=='l' || sigma=='L'
-	       strategy='l';
-	    elseif sigma=='s' || sigma=='S'
-	       strategy='s';
-	    else
-	       disp('string sigma must be either `l´ or `s´')
-	       return
-	    end
-	 else
-	    strategy=sigma;
-	    if (~isnumeric(strategy) || size(strategy,1)~=1 || ...
-	        size(strategy,2)~=1  || ~isreal(strategy))
-	       disp('sigma must be a real scalar')
-	       return
-	    end
-	 end
-      end
-   end
-end
-
-
-% PJD(A,M,k,sigma,options) or PJD(A,k,sigma,options,PREC) or PJD(A,[],k,sigma,options)
-% check fifth argument
-if nargin>=5+flag_matvec
-   % PJD(A,M,k,sigma,options)
-   if ~isempty(M)
-      options=optionsin;
-      if ~isfield(options, 'madspace')
-	 options.madspace=myoptions.madspace;
-      end   
-      if ~isfield(options, 'maxit')
-	 options.maxit=myoptions.maxit;
-      end   
-      if ~isfield(options, 'restol')
-	 options.restol=myoptions.restol;
-      end   
-      if ~isfield(options, 'disp')
-	 options.disp=myoptions.disp;
-      end   
-      if ~isfield(options, 'V0')
-	 options.V0=myoptions.V0;
-      end   
-      if ~isfield(options, 'mem')
-	 options.mem=myoptions.mem;
-      end   
-      if ~isfield(options, 'droptol')
-	 options.droptol=myoptions.droptol;
-      end   
-      if ~isfield(options, 'condest')
-	 options.condest=myoptions.condest;
-      end   
-
-   % PJD(A,k,sigma,options,PREC) or PJD(A,[],k,sigma,options)
-   else
-      % PJD(A,k,sigma,options,PREC)
-      if ~isempty(Min)
-         PREC=optionsin;
-	 if ~isa(PREC,'function_handle') && ~isstr(PREC)
-	    disp('PREC must be provided as a function handle or string')
-	    return
-	 end
-	 EXPREC=1; 
-	 if isa(PREC,'function_handle')
-	    PRECNAME=func2str(PREC);
-	 else
-	    PRECNAME=PREC;
-	 end
-
-      % PJD(A,[],k,sigma,options)
-      else
-	 options=optionsin;
-	 if ~isfield(options, 'madspace')
-	    options.madspace=myoptions.madspace;
-	 end   
-	 if ~isfield(options, 'maxit')
-	    options.maxit=myoptions.maxit;
-	 end   
-	 if ~isfield(options, 'restol')
-	    options.restol=myoptions.restol;
-	 end   
-	 if ~isfield(options, 'disp')
-	    options.disp=myoptions.disp;
-	 end   
-	 if ~isfield(options, 'V0')
-	    options.V0=myoptions.V0;
-	 end   
-	 if ~isfield(options, 'mem')
-	    options.mem=myoptions.mem;
-	 end   
-	 if ~isfield(options, 'droptol')
-	    options.droptol=myoptions.droptol;
-	 end   
-	 if ~isfield(options, 'condest')
-	    options.condest=myoptions.condest;
-	 end   
-      end
-   end
-end
-
-
-% PJD(A,M,k,sigma,options,PREC)
-if nargin==6+flag_matvec
-   if ~isa(PREC,'function_handle') && ~isstr(PREC)
       disp('PREC must be provided as a function handle or string')
       return
    end
-   EXPREC=1; 
-   if isa(PREC,'function_handle')
-      PRECNAME=func2str(PREC);
-   else
-      PRECNAME=PREC;
-   end
-end
+end % if
 
 if flag_matvec && ~EXPREC
    disp('A must be explicitly given if no preconditoner is available');
@@ -430,5 +388,3 @@ else % only mat-vec passed, then a preconditioner is mandatory
       end
    end % if-else
 end % if-else
-
-
