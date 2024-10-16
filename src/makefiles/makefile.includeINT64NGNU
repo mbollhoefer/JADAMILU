@@ -12,7 +12,7 @@ CPPFLAGS=-E
 # which C-compiler do we use
 CC=gcc
 # C compiler options
-CCFLAGS= -O -m64  -mcmodel=medium -fPIC
+CCFLAGS= -O -m64  -mcmodel=medium -fPIC  $(MKL) 
 #CCFLAGS= -g
 
 
@@ -45,7 +45,7 @@ FF=gfortran
 FALLOW=-fallow-argument-mismatch -fallow-invalid-boz
 # FALLOW=
 # its flags
-FFFLAGS=  -O -m64  -mcmodel=medium -fPIC -fimplicit-none $(FALLOW)
+FFFLAGS=  -O -m64  -mcmodel=medium -fPIC -fimplicit-none $(FALLOW)  $(MKL) 
 #FFFLAGS=  -g -m64  -mcmodel=medium -fPIC -fimplicit-none $(FALLOW)
 
 

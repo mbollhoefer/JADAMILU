@@ -12,7 +12,7 @@ CPPFLAGS=-E
 # which C-compiler do we use
 CC=icc
 # C compiler options
-CCFLAGS= -O3 -fPIC
+CCFLAGS= -O3 -fPIC  $(MKL) 
 #CCFLAGS= -g
 
 
@@ -44,7 +44,7 @@ LONGINTEGER=
 # which fortran compiler is used
 FF=ifort
 # its flags
-FFFLAGS=  -O3 -fpp -fPIC
+FFFLAGS=  -O3 -fpp -fPIC  $(MKL) 
 #FFFLAGS=  -g
 
 

@@ -2,6 +2,7 @@
 #define _ILU_PACK_MACROS_H
 
 #ifdef _DOUBLE_REAL_
+#define MYDDOTC                       myddot
 #define SINGLESYMILUPACKDELETE        ssymamgdelete
 #define SINGLESYMILUPACKINFO          ssymamginfo
 #define SINGLESYMSPDILUPACKCONVERT    ssymspdamgconvert
@@ -376,6 +377,7 @@
 #define TWICE 1
 
 #elif defined _SINGLE_REAL_
+#define MYDDOTC                 mysdot
 #define TRANS                   'T'
 #define PJD_EV                  spjd
 #define PJD_GEP                 spjd_gep
@@ -735,6 +737,7 @@
 
 
 #elif defined _SINGLE_COMPLEX_
+#define MYDDOTC                 mycdotc
 #define TRANS                   'C'
 #define PJD_EV                  cpjd
 #define PJD_GEP                 cpjd_gep
@@ -1096,6 +1099,7 @@
 
 
 #else
+#define MYDDOTC                       myzdotc
 #define SINGLESYMILUPACKDELETE        cheramgdelete
 #define SINGLESYMILUPACKINFO          cheramginfo
 #define SINGLESYMSPDILUPACKCONVERT    cherhpdamgconvert

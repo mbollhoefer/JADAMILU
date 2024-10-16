@@ -13,6 +13,10 @@
 /* only use capital letters */
 #if defined __CAPS__ && !defined __UNDERSCORE__ && !defined __2UNDERSCORES__
 
+#define mysdot                    MYSDOT
+#define myddot                    MYDDOT
+#define mycdotc                   MYCDOTC
+#define myzdotc                   MYZDOTC
 #define sdsymamgsavediag          SDSYMAMGSAVEDIAG	    
 #define sdsymamgsavediaggep       SDSYMAMGSAVEDIAGGEP
 #define sdsymamgsol		  SDSYMAMGSOL		    
@@ -644,6 +648,10 @@
 
 /* no capital letters */
 #elif defined __UNDERSCORE__ && !defined __CAPS__ && !defined __2UNDERSCORES__
+#define mysdot                    mysdot_
+#define myddot                    myddot_
+#define mycdotc                   mycdotc_
+#define myzdotc                   myzdotc_
 #define sdsymamgsavediag          sdsymamgsavediag_	   
 #define sdsymamgsavediaggep       sdsymamgsavediaggep_
 #define sdsymamgsol		  sdsymamgsol_		   
@@ -1271,6 +1279,10 @@
 
 /* both are defined */
 #elif defined __CAPS__ && defined __UNDERSCORE__ && !defined __2UNDERSCORES__
+#define mysdot                    MYSDOT_
+#define myddot                    MYDDOT_
+#define mycdotc                   MYCDOTC_
+#define myzdotc                   MYZDOTC_
 #define sdsymamgsavediag          SDSYMAMGSAVEDIAG_	    
 #define sdsymamgsavediaggep       SDSYMAMGSAVEDIAGGEP_
 #define sdsymamgsol		  SDSYMAMGSOL_		    
@@ -1896,6 +1908,10 @@
 
 /* CAPS and 2 underscores are defined */
 #elif defined __CAPS__ && defined __2UNDERSCORES__
+#define mysdot                    MYSDOT__
+#define myddot                    MYDDOT__
+#define mycdotc                   MYCDOTC__
+#define myzdotc                   MYZDOTC__
 #define sdsymamgsavediag          SDSYMAMGSAVEDIAG__	    
 #define sdsymamgsavediaggep       SDSYMAMGSAVEDIAGGEP__
 #define sdsymamgsol		  SDSYMAMGSOL__		    
@@ -2521,6 +2537,10 @@
 
 /* no capital letters but 2 underscores */
 #elif defined __2UNDERSCORES__ && !defined __CAPS__
+#define mysdot                    mysdot__
+#define myddot                    myddot__
+#define mycdotc                   mycdotc__
+#define myzdotc                   myzdotc__
 #define sdsymamgsavediag          sdsymamgsavediag__	   
 #define sdsymamgsavediaggep       sdsymamgsavediaggep__
 #define sdsymamgsol		  sdsymamgsol__		   
@@ -3148,6 +3168,10 @@
 
 // no switch defined use lower case letters in FORTRAN
 #else
+#define mysdot                    mysdot
+#define myddot                    myddot
+#define mycdotc                   mycdotc
+#define myzdotc                   myzdotc
 #define sdsymamgsavediag          sdsymamgsavediag	   
 #define sdsymamgsavediaggep       sdsymamgsavediaggep
 #define sdsymamgsol		  sdsymamgsol		   

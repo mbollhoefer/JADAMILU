@@ -14,8 +14,13 @@
 #if defined __CAPS__ && !defined __UNDERSCORE__ && !defined __2UNDERSCORES__
 #define caxpy           CAXPY
 #define ccopy           CCOPY
+#ifndef _USE_MKL_
 #define cdotc           CDOTC
 #define cdotu           CDOTU
+#else
+#define cdotc           cblas_cdotc_sub
+#define cdotu           cblas_cdotu_sub
+#endif
 #define cgbmv           CGBMV
 #define cgemm           CGEMM
 #define cgemv           CGEMV
@@ -126,12 +131,17 @@
 #define zher2k          ZHER2K
 #define zswap           ZSWAP
 #define ztpsv           ZTPSV
+#ifndef _USE_MKL_
 #define zdotc           ZDOTC
+#define zdotu           ZDOTU
+#else
+#define zdotc           cblas_zdotc_sub
+#define zdotu           cblas_zdotu_sub
+#endif
 #define zgeru           ZGERU
 #define zherk           ZHERK
 #define zsymm           ZSYMM
 #define ztrmm           ZTRMM
-#define zdotu           ZDOTU
 #define zhbmv           ZHBMV
 #define zhpmv           ZHPMV
 #define zsyr2k          ZSYR2K
@@ -165,8 +175,13 @@
 #elif defined __UNDERSCORE__ && !defined __CAPS__ && !defined __2UNDERSCORES__
 #define caxpy           caxpy_
 #define ccopy           ccopy_
+#ifndef _USE_MKL_
 #define cdotc           cdotc_
 #define cdotu           cdotu_
+#else
+#define cdotc           cblas_cdotc_sub
+#define cdotu           cblas_cdotu_sub
+#endif
 #define cgbmv           cgbmv_
 #define cgemm           cgemm_
 #define cgemv           cgemv_
@@ -277,12 +292,17 @@
 #define zher2k          zher2k_
 #define zswap           zswap_
 #define ztpsv           ztpsv_
+#ifndef _USE_MKL_
 #define zdotc           zdotc_
+#define zdotu           zdotu_
+#else
+#define zdotc           cblas_zdotc_sub
+#define zdotu           cblas_zdotu_sub
+#endif
 #define zgeru           zgeru_
 #define zherk           zherk_
 #define zsymm           zsymm_
 #define ztrmm           ztrmm_
-#define zdotu           zdotu_
 #define zhbmv           zhbmv_
 #define zhpmv           zhpmv_
 #define zsyr2k          zsyr2k_
@@ -315,8 +335,13 @@
 #elif defined __CAPS__ && defined __UNDERSCORE__ && !defined __2UNDERSCORES__
 #define caxpy           CAXPY_
 #define ccopy           CCOPY_
+#ifndef _USE_MKL_
 #define cdotc           CDOTC_
 #define cdotu           CDOTU_
+#else
+#define cdotc           cblas_cdotc_sub
+#define cdotu           cblas_cdotu_sub
+#endif
 #define cgbmv           CGBMV_
 #define cgemm           CGEMM_
 #define cgemv           CGEMV_
@@ -427,12 +452,17 @@
 #define zher2k          ZHER2K_
 #define zswap           ZSWAP_
 #define ztpsv           ZTPSV_
+#ifndef _USE_MKL_
 #define zdotc           ZDOTC_
+#define zdotu           ZDOTU_
+#else
+#define zdotc           cblas_zdotc_sub
+#define zdotu           cblas_zdotu_sub
+#endif
 #define zgeru           ZGERU_
 #define zherk           ZHERK_
 #define zsymm           ZSYMM_
 #define ztrmm           ZTRMM_
-#define zdotu           ZDOTU_
 #define zhbmv           ZHBMV_
 #define zhpmv           ZHPMV_
 #define zsyr2k          ZSYR2K_
@@ -465,8 +495,13 @@
 #elif defined __CAPS__ && defined __2UNDERSCORES__
 #define caxpy           CAXPY__
 #define ccopy           CCOPY__
+#ifndef _USE_MKL_
 #define cdotc           CDOTC__
 #define cdotu           CDOTU__
+#else
+#define cdotc           cblas_cdotc_sub
+#define cdotu           cblas_cdotu_sub
+#endif
 #define cgbmv           CGBMV__
 #define cgemm           CGEMM__
 #define cgemv           CGEMV__
@@ -577,12 +612,17 @@
 #define zher2k          ZHER2K__
 #define zswap           ZSWAP__
 #define ztpsv           ZTPSV__
+#ifndef _USE_MKL_
 #define zdotc           ZDOTC__
+#define zdotu           ZDOTU__
+#else
+#define zdotc           cblas_zdotc_sub
+#define zdotu           cblas_zdotu_sub
+#endif
 #define zgeru           ZGERU__
 #define zherk           ZHERK__
 #define zsymm           ZSYMM__
 #define ztrmm           ZTRMM__
-#define zdotu           ZDOTU__
 #define zhbmv           ZHBMV__
 #define zhpmv           ZHPMV__
 #define zsyr2k          ZSYR2K__
@@ -616,8 +656,13 @@
 #elif defined __2UNDERSCORES__ && !defined __CAPS__
 #define caxpy           caxpy__
 #define ccopy           ccopy__
+#ifndef _USE_MKL_
 #define cdotc           cdotc__
 #define cdotu           cdotu__
+#else
+#define cdotc           cblas_cdotc_sub
+#define cdotu           cblas_cdotu_sub
+#endif
 #define cgbmv           cgbmv__
 #define cgemm           cgemm__
 #define cgemv           cgemv__
@@ -728,12 +773,17 @@
 #define zher2k          zher2k__
 #define zswap           zswap__
 #define ztpsv           ztpsv__
+#ifndef _USE_MKL_
 #define zdotc           zdotc__
+#define zdotu           zdotu__
+#else
+#define zdotc           cblas_zdotc_sub
+#define zdotu           cblas_zdotu_sub
+#endif
 #define zgeru           zgeru__
 #define zherk           zherk__
 #define zsymm           zsymm__
 #define ztrmm           ztrmm__
-#define zdotu           zdotu__
 #define zhbmv           zhbmv__
 #define zhpmv           zhpmv__
 #define zsyr2k          zsyr2k__
@@ -767,8 +817,13 @@
 
 #define caxpy           caxpy
 #define ccopy           ccopy
+#ifndef _USE_MKL_
 #define cdotc           cdotc
 #define cdotu           cdotu
+#else
+#define cdotc           cblas_cdotc_sub
+#define cdotu           cblas_cdotu_sub
+#endif
 #define cgbmv           cgbmv
 #define cgemm           cgemm
 #define cgemv           cgemv
@@ -879,12 +934,17 @@
 #define zher2k          zher2k
 #define zswap           zswap
 #define ztpsv           ztpsv
+#ifndef _USE_MKL_
 #define zdotc           zdotc
+#define zdotu           zdotu
+#else
+#define zdotc           cblas_zdotc_sub
+#define zdotu           cblas_zdotu_sub
+#endif
 #define zgeru           zgeru
 #define zherk           zherk
 #define zsymm           zsymm
 #define ztrmm           ztrmm
-#define zdotu           zdotu
 #define zhbmv           zhbmv
 #define zhpmv           zhpmv
 #define zsyr2k          zsyr2k

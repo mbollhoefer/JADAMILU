@@ -1441,11 +1441,11 @@ c      PARAMETER (EPSM=MY_OWN_EPS,RINF=MY_OWN_RINF)
       REAL tic,toc,totaltime
 *     .. External Routines ..
       REALS NRM2
-      FLOAT DISTDOT
+      FLOAT MYDDOT
       EXTERNAL      AXPY, COPY, RSCAL, NRM2
       EXTERNAL      SYR2K, SYRK, SYR20, SYR0
       EXTERNAL      evaluatetime, GEMM, GEMV
-      EXTERNAL      SYMV, DISTDOT 
+      EXTERNAL      SYMV, MYDDOT 
 *
 *     ..
 *
@@ -1635,7 +1635,7 @@ cmb   data statement uniformly moved to external definition
  5    CONTINUE
       ITER=ITER+1
       IF (GEP) THEN
-        SCLR1=CTOD(DISTDOT(N,X(VV+(IJ-1)*N),1,X(BV+(IJ-1)*N),1))
+        SCLR1=CTOD(MYDDOT(N,X(VV+(IJ-1)*N),1,X(BV+(IJ-1)*N),1))
         IF (SCLR1.LE.ZERO) GOTO 196
         SCLR1=SQRT(SCLR1)
         CALL RSCAL(N,ONE/SCLR1,X(BV+(IJ-1)*N),1)
@@ -1698,10 +1698,10 @@ cmb   data statement uniformly moved to external definition
         IF (ISERCH.EQ.2) THEN
           IF (GEP) THEN
            CALL GEMV('N',J,J,ONEF,X(MM),MODSPACE,X(YY),1,ZEROF,X(WL),1)
-           THMT=CTOD(DISTDOT(J,X(WL),1,X(YY),1))/(NBU*NBU)
+           THMT=CTOD(MYDDOT(J,X(WL),1,X(YY),1))/(NBU*NBU)
           ELSE
            CALL SYMV('U',J,ONEF,X(MM),MODSPACE,X(YY),1,ZEROF,X(WL),1)
-           THMT=CTOD(DISTDOT(J,X(WL),1,X(YY),1))
+           THMT=CTOD(MYDDOT(J,X(WL),1,X(YY),1))
           END IF
           THETA=THMT+SIGMA
         ELSE
@@ -1748,7 +1748,7 @@ cmb   data statement uniformly moved to external definition
            RLBL=11
            RETURN
  15        CONTINUE
-           SCLR1=CTOD(DISTDOT(N,X(UU),1,X(BU),1))
+           SCLR1=CTOD(MYDDOT(N,X(UU),1,X(BU),1))
            IF (SCLR1.LE.ZERO) GOTO 196
            SCLR1=SQRT(SCLR1)
            CALL RSCAL(N,ONE/SCLR1,X(BU),1)
@@ -1849,7 +1849,7 @@ cmb   data statement uniformly moved to external definition
             SCLR1=NRM2(J,X(YY2),1)
             CALL RSCAL(J,ONE/SCLR1,X(YY2),1)
             CALL SYMV('U',J,ONEF,X(MM),MODSPACE,X(YY2),1,ZEROF,X(WL),1)
-            THETA2=CTOD(DISTDOT(J,X(YY2),1,X(WL),1))
+            THETA2=CTOD(MYDDOT(J,X(YY2),1,X(WL),1))
            END IF
           DELTA1=RABS(THETA2)-RABS(THETA-SIGMA)
          ELSE
@@ -1880,7 +1880,7 @@ cmb   data statement uniformly moved to external definition
           GAP=ZERO
         end if
       end if
-      IF(GEP) AXPYBETA=DISTDOT(N,X(BU),1,X(REIG),1)/(NBU*NBU)  
+      IF(GEP) AXPYBETA=MYDDOT(N,X(BU),1,X(REIG),1)/(NBU*NBU)  
  30   CONTINUE
       CALL LSOLREVCOM( N, X(XCG), X(WCG), N, X(XCG2), X(BT), ITCG, 
      $                 IFO, NDX1, NDX2, NDX3, GK, ALPHA, IJOB, GEP)
@@ -1902,7 +1902,7 @@ cmb   data statement uniformly moved to external definition
          ELSE
            CALL AXPY(N,AXPYALPHA,X(NDX1),1,X(NDX2),1)
          END IF
-         IF (GEP) AXPYALPHA=DISTDOT(N,X(BU),1,X(NDX2),1)/(NBU*NBU)
+         IF (GEP) AXPYALPHA=MYDDOT(N,X(BU),1,X(NDX2),1)/(NBU*NBU)
          CALL REPGS(N,X(BU),N,X(UU),N,1,X(NDX2),X(NP),EPSM,-1)
          ALPRHO=CTOD(X(NP))
          ITER=ITER+1
@@ -1968,7 +1968,7 @@ c
            RLBL=12
            RETURN
  45        CONTINUE
-           SCLR1=CTOD(DISTDOT(N,X(UU),1,X(BU),1))
+           SCLR1=CTOD(MYDDOT(N,X(UU),1,X(BU),1))
            IF (SCLR1.LE.ZERO) GOTO 196
            SCLR1=SQRT(SCLR1)
            CALL RSCAL(N,ONE/SCLR1,X(BU),1)
@@ -1998,7 +1998,7 @@ c
  55        CONTINUE
            ITER=ITER+1
       IF (GEP) THEN
-        SCLR1=CTOD(DISTDOT(N,X(XCG),1,X(BV+J*N),1))
+        SCLR1=CTOD(MYDDOT(N,X(XCG),1,X(BV+J*N),1))
         IF (SCLR1.LE.ZERO) GOTO 196
         SCLR1=SQRT(SCLR1)
         CALL RSCAL(N,ONE/SCLR1,X(XCG),1)
@@ -2042,11 +2042,11 @@ c
         END IF
         IF (ISERCH.EQ.2) THEN
            CALL SYMV('U',J,ONEF,X(NN),MODSPACE,X(YY),1,ZEROF,X(WL2),1)
-           SCLR1=CTOD(DISTDOT(J,X(YY),1,X(WL2),1))
+           SCLR1=CTOD(MYDDOT(J,X(YY),1,X(WL2),1))
           IF (GEP) THEN
             CALL GEMV('N',J,J,ONEF,X(MM),MODSPACE,X(YY),1,
      $                ZEROF,X(WL),1)
-            AXPYALPHA=DISTDOT(J,X(YY),1,X(WL),1)
+            AXPYALPHA=MYDDOT(J,X(YY),1,X(WL),1)
             THMT=CTOD(AXPYALPHA)/(ALPRHO*NBU*NBU)
             AXPYALPHA=-AXPYALPHA/SCLR1
             CALL AXPY(J,AXPYALPHA,X(WL2),1,X(WL),1)
@@ -2057,7 +2057,7 @@ c
             CALL GERK(J,J,-ONE/SCLR1,X(WL2),1,X(WL3),1,X(MP),MODSPACE)
           ELSE
            CALL SYMV('U',J,ONEF,X(MM),MODSPACE,X(YY),1,ZEROF,X(WL),1)
-           THMT=CTOD(DISTDOT(J,X(YY),1,X(WL),1))
+           THMT=CTOD(MYDDOT(J,X(YY),1,X(WL),1))
            AXPYALPHA=-THMT/(2*SCLR1)
            CALL AXPY(J,AXPYALPHA,X(WL2),1,X(WL),1)
            AXPYALPHA=-ONEF/SCLR1
@@ -2068,7 +2068,7 @@ c
           CALL COPY(MODSPACE*MODSPACE, X(NN), 1, X(NP),1)
         ELSE
            CALL SYMV('U',J,ONEF,X(MM),MODSPACE,X(YY),1,ZEROF,X(WL),1)
-           THETA=CTOD(DISTDOT(J,X(YY),1,X(WL),1))
+           THETA=CTOD(MYDDOT(J,X(YY),1,X(WL),1))
            ETA0=MIN(ETA0,THETA)
            SCLR1=NRM2(J,X(MP),MODSPACE+1)
            IF (THETA.LT.0) SCLR1=SCLR1-2*THETA
@@ -2325,7 +2325,7 @@ c
       RETURN
  255  CONTINUE
       ITER=ITER+1
-      THETA=CTOD(DISTDOT(N,X(N*(I-1)+XX),1,X(VV),1))
+      THETA=CTOD(MYDDOT(N,X(N*(I-1)+XX),1,X(VV),1))
       AXPYALPHA=-THETA
       CALL AXPY(N,AXPYALPHA,X(N*(I-1)+BX),1,X(VV),1)
       NREIG=NRM2(N,X(VV),1)
@@ -2571,9 +2571,9 @@ c ! This causes trouble when using single precision but 64 bit integer !
       SAVE
 *   
 *     .. External Routines ..
-      FLOAT DISTDOT
+      FLOAT MYDDOT
       REALS NRM2
-      EXTERNAL         NRM2, DISTDOT
+      EXTERNAL         NRM2, MYDDOT
 *     ..
 *     .. Executable Statements ..
 *
@@ -2622,7 +2622,7 @@ c ! This causes trouble when using single precision but 64 bit integer !
         IF (GEP) THEN
           TN = NRM2( N, BT, 1 )
           TN = TN/NBU
-          BUBT=-DISTDOT(N,BU,1,BT,1)/(NBU*NBU)
+          BUBT=-MYDDOT(N,BU,1,BT,1)/(NBU*NBU)
           ALP=ABS(ONE+BUBT)
           TN=SQRT(CTOD(CONJ(TN+BUBT)*(TN-BUBT)))/ALP
         ELSE
@@ -3061,7 +3061,7 @@ C     All done
 *  IJOB    (input/output) integer. 
 *          Used to communicate job code between the levels.
 *
-*  BLAS CALLS:   AXPY, COPY, DISTDOT, NRM2
+*  BLAS CALLS:   AXPY, COPY, MYDDOT, NRM2
 *  ============================================================
 *
 *     .. Parameters ..
@@ -3076,13 +3076,13 @@ C     All done
 *
 *     indicates where to resume from. Only valid when IJOB = 2!
       integer RLBL
-      FLOAT AXPYALPHA, DISTDOT
+      FLOAT AXPYALPHA, MYDDOT
 *
 *     saving all.
       SAVE
 *     ..
 *     .. External Routines ..
-      EXTERNAL         AXPY, COPY, DISTDOT, NRM2
+      EXTERNAL         AXPY, COPY, MYDDOT, NRM2
 *     ..
 *     .. Executable Statements ..
 *
@@ -3145,7 +3145,7 @@ C     All done
  3       CONTINUE
 *****************
 *
-         RHO = CTOD(DISTDOT( N, WORK(1,R), 1, WORK(1,Z), 1 ))
+         RHO = CTOD(MYDDOT( N, WORK(1,R), 1, WORK(1,Z), 1 ))
          IF (POSDEF.AND.RHO.LE.ZERO) THEN
           PRINT *, 
      $    ' Non fatal bug: the preconditioner is not positive definite'
@@ -3180,7 +3180,7 @@ C     All done
  4       CONTINUE
 *****************
 *
-         ALPHA =  CTOD(DISTDOT( N, WORK(1,P), 1, WORK(1,Q), 1 ))
+         ALPHA =  CTOD(MYDDOT( N, WORK(1,P), 1, WORK(1,Q), 1 ))
          IF ((POSDEF.AND.ALPHA.LE.ZERO).OR.ALPHA.EQ.0) GOTO 40
          ALPHA =  RHO / ALPHA 
 *

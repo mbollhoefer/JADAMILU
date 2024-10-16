@@ -2825,6 +2825,12 @@ void zprivatehptrs(character *uplo, integer *n, integer *nrhs,
 		   doublecomplex *b, integer *ldb, integer *info,
 		   ftnlen uplolen);
 
+real          mysdot (integer *n, real *x,          integer *ix, real *y,          integer *iy);
+double        myddot (integer *n, double *x,        integer *ix, double *y,        integer *iy);
+complex       mycdotc(integer *n, complex *x,       integer *ix, complex *y,       integer *iy);
+doublecomplex myzdotc(integer *n, doublecomplex *x, integer *ix, doublecomplex *y, integer *iy);
+
+
 doubleprecision iprandom();
 void   ipsrandom(unsigned integer *);
 

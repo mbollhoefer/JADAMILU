@@ -2,6 +2,10 @@
 # default preconditioned Jacobi-Davidson main driver
 MAIN=PJD
 
+# decide whether to use Intel MKL
+MKL=-D_USE_MKL_
+
+
 # -----------------------------------------------------
 
 ILUPACK=$(DIRILUPACK)$(PRECISION)symAMGextract.o          \
@@ -69,7 +73,8 @@ ILUPACK=$(DIRILUPACK)$(PRECISION)symAMGextract.o          \
         $(DIRILUPACK)$(PRECISION)singlesymamgrestorediag.o \
         $(DIRILUPACK)$(PRECISION)singleunscale.o           \
         $(DIRILUPACK)$(PRECISION)singlesymilupackfactorgep.o\
-        $(DIRILUPACK)$(PRECISION)singlesymilupackfactor.o
+        $(DIRILUPACK)$(PRECISION)singlesymilupackfactor.o\
+        $(DIRILUPACK)$(PRECISION)myddot.o
 
 
 

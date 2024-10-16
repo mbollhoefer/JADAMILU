@@ -4,8 +4,15 @@
 #include "namesblas.h"
 #include "long_integer.h"
 
-complex              cdotc(integer *,complex *,integer *,complex *,integer *),
-                     cdotu(integer *,complex *,integer *,complex *,integer *);
+#ifdef _USE_MKL_
+void cblas_cdotu_sub(integer N, complex *X, integer incX,
+		     complex *Y, integer incY, complex *dotu);
+void cblas_cdotc_sub(integer N, complex *X, integer incX,
+		     complex *Y, integer incY, complex *dotc);
+#else
+complex        cdotc(integer *,complex *,integer *,complex *,integer *),
+               cdotu(integer *,complex *,integer *,complex *,integer *);
+#endif
 void                 caxpy(integer *,complex *,complex *,integer *,complex *,
 			   integer *),
                      ccopy(integer *,complex *,integer *,complex *,integer *),
@@ -242,11 +249,16 @@ extern void          sgemm(character *,character *,integer *,integer *,
 			   real *,integer *,real *,real *,integer *, ftnlen),
                      stpmv(character *,character *,character *,integer *, 
 			   real *,real *,integer *,ftnlen,ftnlen,ftnlen);
+#ifdef _USE_MKL_
+void cblas_zdotu_sub(integer N, doublecomplex *X, integer incX,
+		     doublecomplex *Y, integer incY, void *dotu);
+void cblas_zdotc_sub(integer N, doublecomplex *X, integer incX,
+		     doublecomplex *Y, integer incY, void *dotc);
+#else
+doublecomplex        zdotc(integer *,doublecomplex *,integer *,doublecomplex *,integer *),
+                     zdotu(integer *,doublecomplex *,integer *,doublecomplex *,integer *);
+#endif
 
-doublecomplex        zdotc(doublecomplex *,integer *,doublecomplex *,integer *,
-			   doublecomplex *,integer *),
-                     zdotu(doublecomplex *,integer *,doublecomplex *,integer *,
-			   doublecomplex *,integer *);
 void                 zaxpy(integer *,doublecomplex *,doublecomplex *,integer *,
 			   doublecomplex *,integer *),
                      zgemv(character *,integer *,integer *,doublecomplex *,
