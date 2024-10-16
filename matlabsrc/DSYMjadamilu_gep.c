@@ -338,7 +338,7 @@ void mexFunction
     if (ncols>maxeig || (mrows!=n&&ncols>0))
        mexErrMsgTxt("V0 must be an n times l matrix with l<=k.");
     pr=mxGetPr(V0);
-    lx=n*(4*madspace+2*maxeig+1)+4*madspace*madspace;
+    lx=n*(4*madspace+2*maxeig+4)+6*madspace+4*madspace*madspace+MAX(madspace*madspace,maxeig);
     X=(double *)mxCalloc((size_t)lx,sizeof(double));
     /* init with initial eigenvector guesses */
     j=0;

@@ -40,19 +40,23 @@ function [V,D,options] = PJD(A,sizea,M,k,sigma,options,PREC)
 
   
 optionsin=PJDinit(A);
+A_matvec=(isa(A,'function_handle') || isstr(A));
+M_matvec=(nargin>=3 && (isa(M,'function_handle') || isstr(M)));
+
+
 % check trivial 1x1 eigenvalue problem for consistency
-if isa(A,'function_handle') || isstr(A)
+if A_matvec
    if nargin<2
       fprintf('if a string or function handle is passed as A, then you must provide as second parameter its scalar dimension\n');
       return
    end % if
    n=sizea;
-
+  
    % PJD(A,sizea,M,k,   sigma,options,PREC)
    % or
    % PJD(A,sizea,k,     sigma,options,PREC)
 
-   if n==1
+   if n==1 && ~M_matvec
       % k or M? Both have to be 1x1
       if nargin>=3
 	 if size(M,1)~=1 || size(M,2)~=1
@@ -67,9 +71,9 @@ if isa(A,'function_handle') || isstr(A)
       options.res=0;
       V=1;
       if isa(A,'function_handle')
-	 D=A(1);
+	 DA=A(1);
       else
-	 D=feval(A,1);
+	 DA=feval(A,1);
       end % if-else
       % PJD(A,sizea)
       if nargin==2
@@ -80,11 +84,33 @@ if isa(A,'function_handle') || isstr(A)
 	 if M==1
 	    return
 	 else
-            D=D/M;
+            DA=DA/M;
 	    return
 	 end
-      end % if
-   end % if
+       end % if
+   elseif n==1
+       % M provided as function handle or string
+       if isa(M,'function_handle')
+	  DM=M(1);
+       else
+          DM=feval(M,1);
+       end
+	
+       options=optionsin;
+       options.niter=0;
+       options.info=0;
+       options.res=0;
+       V=1;
+       if isa(A,'function_handle')
+	  DA=A(1);
+       else
+	  DA=feval(A,1);
+       end % if-else
+       % PJD(A,sizea,M,...) or PJD(A,sizea,M,k,...)
+       % if k is provided, only k==1 makes sense
+       D=DA/DM;
+       return
+   end % if-elseif n=1 and not M_matvec
    
 else
    % PJD(A,M,k,   sigma,options,PREC)
@@ -94,6 +120,10 @@ else
    if n==1
       % k or M? Both have to be 1x1
       if nargin>=2
+	 if M_matvec
+	    fprintf('second input be explicitly given as matrix\n');
+	    return
+	 end
 	 if size(M,1)~=1 || size(M,2)~=1
 	    fprintf('second input must be a scalar\n');
 	    return
@@ -105,7 +135,7 @@ else
       options.info=0;
       options.res=0;
       V=1;
-      D=A;
+      DA=A;
       % PJD(A)
       if nargin==1
 	 return
@@ -115,7 +145,7 @@ else
 	 if M==1
       	    return
 	 else
-            D=D/M;
+            D=DA/M;
 	    return
 	 end
       end % if
@@ -134,13 +164,12 @@ EXPREC=0;
 
 flag_matvec=0;
 sigmain='l';
-if isa(A,'function_handle') || isstr(A)
+if A_matvec
    if nargin<2
       fprintf('if a string or function handle is passed as A, then you must provide as second parameter its scalar dimension\n');
       return
    end % if
 
-   flag_matvec=1;
    if isa(A,'function_handle')
       ANAME=func2str(A);
    else
@@ -162,10 +191,19 @@ if isa(A,'function_handle') || isstr(A)
       sigma=sigmain;   
       options=optionsin;
    else % nargin>=3
-      % no, but something else, thus shift!
-      if size(M,1)~=n || size(M,2)~=n
+      if M_matvec
+	 if isa(M,'function_handle')
+	    MNAME=func2str(M);
+	 else
+	    MNAME=M;
+	 end % if-else
+	 if nargin==7
+	    EXPREC=1;
+	 end 
+      elseif size(M,1)~=n || size(M,2)~=n
+         % no, but something else, thus shift!
 	 GEP=0;
-         % shift input variables
+	 % shift input variables
 	 if nargin>=6
 	    PREC=options;
 	    EXPREC=1;
@@ -181,7 +219,11 @@ if isa(A,'function_handle') || isstr(A)
 	    sigma=sigmain;   
 	 end 
 	 k=M;
-      end % if
+      else % M explictly given, function name for A
+	 if nargin==7
+	    EXPREC=1;
+	 end 
+      end % if-elseif
    end % if-else
 else % matrix explicitly given, no sizea
 
@@ -202,6 +244,10 @@ else % matrix explicitly given, no sizea
       options=optionsin;
    else % nargin>=2
       % no, but something else, thus shift!
+      if isa(sizea,'function_handle') || isstr(sizea)
+	 fprintf('if A is explicitly passed, so must M\n');
+	 return;
+      end
       if size(sizea,1)~=n || size(sizea,2)~=n
 	 GEP=0;
 	 % shift input variables without M
@@ -252,7 +298,7 @@ end % if
 
 % check M
 if GEP
-   if ~ishermitian(M)
+   if ~M_matvec && ~ishermitian(M)
       disp('M must be a square symmetrix(Hermitian) matrix of same size as A')
       return
    end
@@ -322,14 +368,14 @@ if EXPREC
    end
 end % if
 
-if flag_matvec && ~EXPREC
+if A_matvec && ~EXPREC
    disp('A must be explicitly given if no preconditoner is available');
    return
 end % if
 
 
 % matrix A explictly stated
-if ~flag_matvec
+if ~A_matvec
    Adgl=sign(diag(A));
    I=find(Adgl==0);
    Adgl(I)=1;
@@ -341,14 +387,14 @@ if ~flag_matvec
             [V,D,options]=DSYMjadamilu(A+ADgl,k,sigma,options);
 	 else
             [V,D,options]=ZHERjadamilu(A+ADgl,k,sigma,options);
-	 end
+	 end % if-else
       else
 	 if isreal(A)
             [V,D,options]=DSYMjadamilurevcom(A+ADgl,k,sigma,options,PRECNAME);
 	 else
             [V,D,options]=ZHERjadamilurevcom(A+ADgl,k,sigma,options,PRECNAME);
-	 end
-      end
+	 end % if-else
+      end % if-else ~EXPREC
    else % GEP
       Mdgl=sign(diag(M));
       I=find(Mdgl==0);
@@ -359,17 +405,17 @@ if ~flag_matvec
             [V,D,options]=DSYMjadamilu_gep(A+ADgl,M+MDgl,k,sigma,options);
 	 else
             [V,D,options]=ZHERjadamilu_gep(A+ADgl,M+MDgl,k,sigma,options);
-	 end
+	 end % if-else
       else
 	 if isreal(A)
             [V,D,options]=DSYMjadamilurevcom_gep(A+ADgl,M+MDgl,k,sigma,options,PRECNAME);
 	 else
             [V,D,options]=ZHERjadamilurevcom_gep(A+ADgl,M+MDgl,k,sigma,options,PRECNAME);
-	 end
-      end
-   end
+	 end % if-else
+      end % if-else ~EXPREC
+   end % if-else GEP
 else % only mat-vec passed, then a preconditioner is mandatory
-   % M,GEP,k,strategy, options, EXPREC
+   % M(resp. MNAME),GEP,k,strategy, options, EXPREC
    if ~GEP
        if isfield(options,'isreal') && options.isreal
           [V,D,options]=DSYMjadamilurevcom_matvec(ANAME,n,k,sigma,options,PRECNAME);
@@ -377,14 +423,22 @@ else % only mat-vec passed, then a preconditioner is mandatory
           [V,D,options]=ZHERjadamilurevcom_matvec(ANAME,n,k,sigma,options,PRECNAME);
        end
    else % GEP
-      Mdgl=sign(diag(M));
-      I=find(Mdgl==0);
-      Mdgl(I)=1;
-      MDgl=spdiags(realmin*Mdgl,0,n,n);
-      if isfield(options,'isreal') && options.isreal
-         [V,D,options]=DSYMjadamilurevcom_gep_matvec(ANAME,n,M+MDgl,k,sigma,options,PRECNAME);
-      else
-         [V,D,options]=ZHERjadamilurevcom_gep(ANAME,n,M+MDgl,k,sigma,options,PRECNAME);
-      end
-   end % if-else
-end % if-else
+      if ~M_matvec
+	 Mdgl=sign(diag(M));
+	 I=find(Mdgl==0);
+	 Mdgl(I)=1;
+	 MDgl=spdiags(realmin*Mdgl,0,n,n);
+	 if isfield(options,'isreal') && options.isreal
+	    [V,D,options]=DSYMjadamilurevcom_gep_matvec(ANAME,n,M+MDgl,k,sigma,options,PRECNAME);
+	 else
+	    [V,D,options]=ZHERjadamilurevcom_gep_matvec(ANAME,n,M+MDgl,k,sigma,options,PRECNAME);
+	 end % if-else
+      else % M_matvec
+	 if isfield(options,'isreal') && options.isreal
+	    [V,D,options]=DSYMjadamilurevcom_gep_matvec_matvec(ANAME,n,MNAME,k,sigma,options,PRECNAME);
+	 else
+	    [V,D,options]=ZHERjadamilurevcom_gep_matvec_matvec(ANAME,n,MNAME,k,sigma,options,PRECNAME);
+	 end % if-else
+      end % if-else ~M_matvec
+   end % if-else ~GEP
+end % if-else A_matvec

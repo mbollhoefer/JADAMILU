@@ -24,7 +24,8 @@ DOBJECTS=$(MEXDIR)/DSYMjadamilu.$(EXT) \
          $(MEXDIR)/DSYMjadamilurevcom.$(EXT)\
          $(MEXDIR)/DSYMjadamilurevcom_gep.$(EXT)\
          $(MEXDIR)/DSYMjadamilurevcom_matvec.$(EXT)\
-         $(MEXDIR)/DSYMjadamilurevcom_gep_matvec.$(EXT)
+         $(MEXDIR)/DSYMjadamilurevcom_gep_matvec.$(EXT)\
+         $(MEXDIR)/DSYMjadamilurevcom_gep_matvec_matvec.$(EXT)
          
 
 ZOBJECTS=$(MEXDIR)/ZHERjadamilu.$(EXT) \
@@ -32,7 +33,8 @@ ZOBJECTS=$(MEXDIR)/ZHERjadamilu.$(EXT) \
          $(MEXDIR)/ZHERjadamilurevcom.$(EXT) \
          $(MEXDIR)/ZHERjadamilurevcom_gep.$(EXT)\
          $(MEXDIR)/ZHERjadamilurevcom_matvec.$(EXT) \
-         $(MEXDIR)/ZHERjadamilurevcom_gep_matvec.$(EXT)
+         $(MEXDIR)/ZHERjadamilurevcom_gep_matvec.$(EXT)\
+         $(MEXDIR)/ZHERjadamilurevcom_gep_matvec_matvec.$(EXT)
          
 
 OBJECTS=$(DOBJECTS) $(ZOBJECTS)

@@ -287,7 +287,7 @@ void mexFunction
        mexErrMsgTxt("V0 must be an n times l matrix with l<=k.");
     pr=mxGetPr(V0);
     pi=mxGetPi(V0);
-    lx=n*(3*madspace+maxeig+1)+4*madspace*madspace;
+    lx=n*(4*madspace+2*maxeig+4)+6*madspace+4*madspace*madspace+MAX(madspace*madspace,maxeig);
     X=(doublecomplex *)mxCalloc((size_t)lx,sizeof(doublecomplex));
     /* init with initial eigenvector guesses */
     j=0;
